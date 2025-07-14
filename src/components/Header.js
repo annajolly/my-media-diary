@@ -46,31 +46,35 @@ export const Header = () => {
               MyMediaDiary
             </Typography>
           </Stack>
-          <Button
-            id="user-menu-button"
-            aria-controls={userMenu.isOpen ? 'user-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={userMenu.isOpen ? 'true' : undefined}
-            onClick={userMenu.open}
-            endIcon={<CaretDownIcon color="rgb(250, 240, 230)" />}
-          >
-            <Typography sx={{ color: 'rgb(250, 240, 230)' }}>
-              {user?.email}
-            </Typography>
-          </Button>
-          <Menu
-            id="user-menu"
-            anchorEl={userMenu.anchorEl}
-            open={userMenu.isOpen}
-            onClose={userMenu.close}
-            slotProps={{
-              list: {
-                'aria-labelledby': 'user-menu-button',
-              },
-            }}
-          >
-            <MenuItem onClick={handleSignout}>Logout</MenuItem>
-          </Menu>
+          {user && (
+            <>
+              <Button
+                id="user-menu-button"
+                aria-controls={userMenu.isOpen ? 'user-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={userMenu.isOpen ? 'true' : undefined}
+                onClick={userMenu.open}
+                endIcon={<CaretDownIcon color="rgb(250, 240, 230)" />}
+              >
+                <Typography sx={{ color: 'rgb(250, 240, 230)' }}>
+                  {user.email}
+                </Typography>
+              </Button>
+              <Menu
+                id="user-menu"
+                anchorEl={userMenu.anchorEl}
+                open={userMenu.isOpen}
+                onClose={userMenu.close}
+                slotProps={{
+                  list: {
+                    'aria-labelledby': 'user-menu-button',
+                  },
+                }}
+              >
+                <MenuItem onClick={handleSignout}>Logout</MenuItem>
+              </Menu>
+            </>
+          )}
         </Stack>
       </Toolbar>
     </AppBar>
