@@ -20,7 +20,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { BookIcon, FilmReelIcon } from '@phosphor-icons/react';
-import { addBookToUser, addMovieToUser } from '../api/firebase';
+import { addBookToUser } from '../api/firebase';
 import { CustomRadio } from './CustomRadio';
 
 export const AddMediaDialog = (props) => {
