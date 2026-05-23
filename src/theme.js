@@ -1,6 +1,16 @@
 import { createTheme } from '@mui/material/styles';
 
 export const appTheme = createTheme({
+  typography: {
+    fontFamily: [
+      'Inter',
+      'Avenir Next',
+      'Avenir',
+      'Helvetica Neue',
+      'Arial',
+      'sans-serif',
+    ].join(','),
+  },
   palette: {
     mode: 'light',
     primary: {
@@ -24,5 +34,14 @@ export const appTheme = createTheme({
       secondary: '#3e5253',
     },
     divider: '#b6c6c7',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
   },
 });
