@@ -59,6 +59,21 @@ const getUserBooks = async () => {
   return books;
 };
 
+const getUserMovies = async () => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const moviesRef = collection(db, `users/${user.uid}/movies`);
+  const querySnapshot = await getDocs(moviesRef);
+
+  const movies = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return movies;
+};
+
 const addBookToUser = async (bookData) => {
   const user = auth.currentUser;
   if (!user) throw new Error('Not authenticated');
@@ -73,6 +88,14 @@ const deleteUserBook = async (bookId) => {
 
   const bookRef = doc(db, `users/${user.uid}/books/${bookId}`);
   await deleteDoc(bookRef);
+};
+
+const deleteUserMovie = async (movieId) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const movieRef = doc(db, `users/${user.uid}/movies/${movieId}`);
+  await deleteDoc(movieRef);
 };
 
 const addMovieToUser = async (movieData) => {
@@ -95,7 +118,9 @@ export {
   onAuthStateChanged,
   signout,
   getUserBooks,
+  getUserMovies,
   addBookToUser,
   deleteUserBook,
+  deleteUserMovie,
   addMovieToUser,
 };

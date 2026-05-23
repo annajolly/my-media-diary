@@ -1,4 +1,5 @@
 import { Button, Stack } from '@mui/material';
+import { PlusIcon } from '@phosphor-icons/react';
 import { useOpenable } from '../hooks/use-openable';
 import { MediaTable } from './MediaTable';
 import { AddMediaDialog } from './AddMediaDialog';
@@ -9,7 +10,11 @@ export const MediaDiary = () => {
   return (
     <Stack m={4} gap={2}>
       <Stack direction="row" justifyContent="flex-end">
-        <Button variant="contained" onClick={addMediaDialog.open}>
+        <Button
+          startIcon={<PlusIcon />}
+          variant="contained"
+          onClick={addMediaDialog.open}
+        >
           Add media
         </Button>
       </Stack>
