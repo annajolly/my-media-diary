@@ -4,6 +4,7 @@ import {
   deleteMediaEntry,
   getMediaEntries,
   mediaEntriesQueryKey,
+  updateMediaEntry,
 } from '../api/media';
 
 export const useMediaEntriesQuery = () => {
@@ -33,6 +34,21 @@ export const useAddBookMutation = (options = {}) => {
 
   return useMutation({
     mutationFn: addBookEntry,
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({ queryKey: mediaEntriesQueryKey });
+      if (options.onSuccess) {
+        await options.onSuccess(...args);
+      }
+    },
+    onError: options.onError,
+  });
+};
+
+export const useUpdateMediaEntryMutation = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateMediaEntry,
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({ queryKey: mediaEntriesQueryKey });
       if (options.onSuccess) {

@@ -13,6 +13,7 @@ import {
   doc,
   addDoc,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -98,6 +99,22 @@ const deleteUserMovie = async (movieId) => {
   await deleteDoc(movieRef);
 };
 
+const updateUserBook = async (bookId, data) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const bookRef = doc(db, `users/${user.uid}/books/${bookId}`);
+  await updateDoc(bookRef, data);
+};
+
+const updateUserMovie = async (movieId, data) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not authenticated');
+
+  const movieRef = doc(db, `users/${user.uid}/movies/${movieId}`);
+  await updateDoc(movieRef, data);
+};
+
 const addMovieToUser = async (movieData) => {
   const user = auth.currentUser;
   if (!user) throw new Error('Not authenticated');
@@ -122,5 +139,7 @@ export {
   addBookToUser,
   deleteUserBook,
   deleteUserMovie,
+  updateUserBook,
+  updateUserMovie,
   addMovieToUser,
 };

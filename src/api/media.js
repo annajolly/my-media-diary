@@ -4,6 +4,8 @@ import {
   deleteUserMovie,
   getUserBooks,
   getUserMovies,
+  updateUserBook,
+  updateUserMovie,
 } from './firebase';
 
 export const mediaEntriesQueryKey = ['mediaEntries'];
@@ -35,6 +37,15 @@ export const deleteMediaEntry = async ({ id, mediaType }) => {
 
 export const addBookEntry = async (bookData) => {
   await addBookToUser(bookData);
+};
+
+export const updateMediaEntry = async ({ id, mediaType, data }) => {
+  if (mediaType === 'movie') {
+    await updateUserMovie(id, data);
+    return;
+  }
+
+  await updateUserBook(id, data);
 };
 
 export const searchBooksByTitle = async (title) => {

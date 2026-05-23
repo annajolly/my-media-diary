@@ -26,12 +26,16 @@ import { alpha } from '@mui/material/styles';
 import {
   useDeleteMediaMutation,
   useMediaEntriesQuery,
+  useUpdateMediaEntryMutation,
 } from '../queries/mediaQueries';
+import { EditMediaDialog } from './EditMediaDialog';
 
 export const MediaTable = () => {
   const [selectedMedia, setSelectedMedia] = React.useState();
+  const [selectedEditMedia, setSelectedEditMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
   const deleteConfirmModal = useOpenable();
+  const editDateModal = useOpenable();
 
   const mediaQuery = useMediaEntriesQuery();
 
@@ -41,6 +45,22 @@ export const MediaTable = () => {
       setSelectedMedia(undefined);
     },
   });
+
+  const updateMediaEntryMutation = useUpdateMediaEntryMutation({
+    onSuccess: async () => {
+      editDateModal.close();
+      setSelectedEditMedia(undefined);
+    },
+  });
+
+  const handleEditClicked = (row) => () => {
+    setSelectedEditMedia({
+      id: row.id,
+      mediaType: row.mediaType,
+      dateConsumed: row.dateConsumed,
+    });
+    editDateModal.open();
+  };
 
   const handleDeleteClicked = (id, mediaType) => () => {
     setSelectedMedia({ id, mediaType });
@@ -64,6 +84,22 @@ export const MediaTable = () => {
 
   const handleMediaFilterChange = (_, nextFilters) => {
     setMediaFilters(nextFilters);
+  };
+
+  const handleSaveConsumedDate = async (dateConsumed) => {
+    if (!selectedEditMedia || !dateConsumed) {
+      return;
+    }
+
+    try {
+      await updateMediaEntryMutation.mutateAsync({
+        id: selectedEditMedia.id,
+        mediaType: selectedEditMedia.mediaType,
+        data: { dateConsumed },
+      });
+    } catch (err) {
+      // TODO: show update error state
+    }
   };
 
   const filteredMediaEntries = React.useMemo(() => {
@@ -144,7 +180,6 @@ export const MediaTable = () => {
               <TableCell>Date</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Author</TableCell>
-              <TableCell>Published</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
@@ -162,10 +197,9 @@ export const MediaTable = () => {
                   {row.title}
                 </TableCell>
                 <TableCell>{row.author ?? '-'}</TableCell>
-                <TableCell>{formatDateCell(row.datePublished)}</TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1}>
-                    <IconButton>
+                    <IconButton onClick={handleEditClicked(row)}>
                       <PencilSimpleIcon size={20} />
                     </IconButton>
                     <IconButton
@@ -199,6 +233,13 @@ export const MediaTable = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <EditMediaDialog
+        open={editDateModal.isOpen}
+        onClose={editDateModal.close}
+        onSave={handleSaveConsumedDate}
+        isSaving={updateMediaEntryMutation.isPending}
+        initialDate={selectedEditMedia?.dateConsumed}
+      />
     </>
   );
 };

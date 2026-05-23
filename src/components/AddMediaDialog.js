@@ -92,7 +92,6 @@ export const AddMediaDialog = (props) => {
 
     const title = selectedBook?.volumeInfo?.title;
     const author = selectedBook?.volumeInfo?.authors?.join(', ');
-    const datePublished = selectedBook?.volumeInfo?.publishedDate ?? '';
 
     if (!dateConsumed) {
       setError('No date selected');
@@ -110,7 +109,6 @@ export const AddMediaDialog = (props) => {
       title,
       author,
       dateConsumed,
-      datePublished,
     });
   };
 
@@ -145,7 +143,6 @@ export const AddMediaDialog = (props) => {
       title,
       author,
       dateConsumed,
-      datePublished: '',
     });
   };
 
