@@ -21,8 +21,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { BookIcon, FilmReelIcon } from '@phosphor-icons/react';
-import { addBookToUser } from '../api/firebase';
+import { searchBooksByTitle } from '../api/media';
 import { CustomRadio } from './CustomRadio';
+import { useAddBookMutation } from '../queries/mediaQueries';
 
 export const AddMediaDialog = (props) => {
   const { open, onClose } = props;
@@ -32,6 +33,15 @@ export const AddMediaDialog = (props) => {
   const [error, setError] = React.useState('');
   const searchFormRef = React.useRef(null);
   const manualFormRef = React.useRef(null);
+
+  const addBookMutation = useAddBookMutation({
+    onSuccess: async () => {
+      onClose();
+    },
+    onError: () => {
+      setError('Problem adding book');
+    },
+  });
 
   const handleChange = async (_, newType) => {
     setSelectedMediaType(newType);
@@ -62,15 +72,8 @@ export const AddMediaDialog = (props) => {
     console.log(title);
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-          title,
-        )}&key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}`,
-      );
-      const data = await response.json();
-      console.log(data);
-
-      setSearchResults(data.items ?? []);
+      const books = await searchBooksByTitle(title);
+      setSearchResults(books);
       setSelectedResultId(null);
     } catch (err) {
       setError('Problem loading media');
@@ -103,12 +106,12 @@ export const AddMediaDialog = (props) => {
 
     setError('');
 
-    try {
-      await addBookToUser({ title, author, dateConsumed, datePublished });
-      onClose();
-    } catch (err) {
-      setError('Problem adding book');
-    }
+    await addBookMutation.mutateAsync({
+      title,
+      author,
+      dateConsumed,
+      datePublished,
+    });
   };
 
   const handleAddBookManual = async (event) => {
@@ -138,12 +141,12 @@ export const AddMediaDialog = (props) => {
 
     setError('');
 
-    try {
-      await addBookToUser({ title, author, dateConsumed, datePublished: '' });
-      onClose();
-    } catch (err) {
-      setError('Problem adding book');
-    }
+    await addBookMutation.mutateAsync({
+      title,
+      author,
+      dateConsumed,
+      datePublished: '',
+    });
   };
 
   return (
@@ -243,7 +246,11 @@ export const AddMediaDialog = (props) => {
                 })}
               </RadioGroup>
               <Stack direction="row" justifyContent="flex-end" marginTop={2}>
-                <Button variant="contained" onClick={handleAddBookFromSearch}>
+                <Button
+                  variant="contained"
+                  onClick={handleAddBookFromSearch}
+                  disabled={addBookMutation.isPending}
+                >
                   Add selected book
                 </Button>
               </Stack>
@@ -288,7 +295,11 @@ export const AddMediaDialog = (props) => {
                   />
                 </Stack>
                 <Stack direction="row" justifyContent="flex-end">
-                  <Button variant="contained" type="submit">
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={addBookMutation.isPending}
+                  >
                     Add manual book
                   </Button>
                 </Stack>

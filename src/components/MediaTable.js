@@ -21,46 +21,26 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { format } from 'date-fns';
-import {
-  getUserBooks,
-  getUserMovies,
-  deleteUserBook,
-  deleteUserMovie,
-} from '../api/firebase';
 import { useOpenable } from '../hooks/use-openable';
 import { alpha } from '@mui/material/styles';
+import {
+  useDeleteMediaMutation,
+  useMediaEntriesQuery,
+} from '../queries/mediaQueries';
 
 export const MediaTable = () => {
-  const [mediaEntries, setMediaEntries] = React.useState();
   const [selectedMedia, setSelectedMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
   const deleteConfirmModal = useOpenable();
 
-  const fetchMediaEntries = React.useCallback(async () => {
-    const [books, movies] = await Promise.all([
-      getUserBooks(),
-      getUserMovies(),
-    ]);
+  const mediaQuery = useMediaEntriesQuery();
 
-    const normalizedBooks = books.map((book) => ({
-      ...book,
-      mediaType: 'book',
-    }));
-
-    const normalizedMovies = movies.map((movie) => ({
-      ...movie,
-      mediaType: 'movie',
-    }));
-
-    setMediaEntries([...normalizedBooks, ...normalizedMovies]);
-  }, []);
-
-  React.useEffect(() => {
-    async function fetchData() {
-      await fetchMediaEntries();
-    }
-    fetchData();
-  }, [fetchMediaEntries]);
+  const deleteMediaMutation = useDeleteMediaMutation({
+    onSuccess: async () => {
+      deleteConfirmModal.close();
+      setSelectedMedia(undefined);
+    },
+  });
 
   const handleDeleteClicked = (id, mediaType) => () => {
     setSelectedMedia({ id, mediaType });
@@ -72,16 +52,14 @@ export const MediaTable = () => {
       return;
     }
 
-    if (selectedMedia.mediaType === 'movie') {
-      await deleteUserMovie(selectedMedia.id);
-    } else {
-      await deleteUserBook(selectedMedia.id);
+    try {
+      await deleteMediaMutation.mutateAsync({
+        id: selectedMedia.id,
+        mediaType: selectedMedia.mediaType,
+      });
+    } catch (err) {
+      // TODO: show delete error state
     }
-
-    setMediaEntries(undefined);
-    deleteConfirmModal.close();
-    setSelectedMedia(undefined);
-    await fetchMediaEntries();
   };
 
   const handleMediaFilterChange = (_, nextFilters) => {
@@ -89,16 +67,16 @@ export const MediaTable = () => {
   };
 
   const filteredMediaEntries = React.useMemo(() => {
-    if (!mediaEntries) {
+    if (!mediaQuery.data) {
       return [];
     }
 
-    return mediaEntries.filter((entry) =>
+    return mediaQuery.data.filter((entry) =>
       mediaFilters.includes(entry.mediaType),
     );
-  }, [mediaEntries, mediaFilters]);
+  }, [mediaQuery.data, mediaFilters]);
 
-  const isLoading = typeof mediaEntries === 'undefined';
+  const isLoading = mediaQuery.isPending;
 
   const formatDateCell = (dateValue) => {
     if (!dateValue) {
@@ -211,7 +189,12 @@ export const MediaTable = () => {
           <Button onClick={deleteConfirmModal.close} color="default">
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleDeletion} color="error">
+          <Button
+            variant="contained"
+            onClick={handleDeletion}
+            color="error"
+            disabled={deleteMediaMutation.isPending}
+          >
             Delete
           </Button>
         </DialogActions>
