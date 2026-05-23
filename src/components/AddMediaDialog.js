@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Divider,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,7 +30,8 @@ export const AddMediaDialog = (props) => {
   const [searchResults, setSearchResults] = React.useState([]);
   const [selectedResultId, setSelectedResultId] = React.useState(null);
   const [error, setError] = React.useState('');
-  const formRef = React.useRef(null);
+  const searchFormRef = React.useRef(null);
+  const manualFormRef = React.useRef(null);
 
   const handleChange = async (_, newType) => {
     setSelectedMediaType(newType);
@@ -43,59 +45,106 @@ export const AddMediaDialog = (props) => {
   const handleSearch = async (event) => {
     event.preventDefault();
 
-    const formData = new FormData(formRef.current);
-    const title = formData.get('add-book-form-title');
+    if (selectedMediaType !== 'book') {
+      return;
+    }
+
+    const formData = new FormData(searchFormRef.current);
+    const title = formData.get('add-book-search-title')?.toString().trim();
+
+    if (!title) {
+      setError('Enter a title to search for a book');
+      return;
+    }
+
+    setError('');
 
     console.log(title);
 
     try {
       const response = await fetch(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-          title
-        )}`
+          title,
+        )}&key=${process.env.REACT_APP_GOOGLE_BOOKS_API_KEY}`,
       );
       const data = await response.json();
       console.log(data);
 
-      setSearchResults(data.items);
+      setSearchResults(data.items ?? []);
+      setSelectedResultId(null);
     } catch (err) {
-      setError('Problem loading media', err);
+      setError('Problem loading media');
     }
   };
 
-  const handleAddBook = () => {
+  const handleAddBookFromSearch = async () => {
     const selectedBook = searchResults.find(
-      (result) => result.id === selectedResultId
+      (result) => result.id === selectedResultId,
     );
-    const title = selectedBook?.volumeInfo?.title;
-    const author = selectedBook?.volumeInfo?.authors?.join(', ');
-    const datePublished = selectedBook?.volumeInfo?.publishedDate;
+    const formData = new FormData(searchFormRef.current);
 
-    const formData = new FormData(formRef.current);
     const dateConsumed = formData
-      .get('add-book-form-date-consumed')
+      .get('add-book-search-date-consumed')
       ?.toString();
 
-    if (title && dateConsumed) {
-      try {
-        addBookToUser({ title, author, dateConsumed, datePublished });
-      } catch (err) {
-        setError('Problem adding book:', err);
-      }
-      onClose();
-    } else if (!dateConsumed) {
+    const title = selectedBook?.volumeInfo?.title;
+    const author = selectedBook?.volumeInfo?.authors?.join(', ');
+    const datePublished = selectedBook?.volumeInfo?.publishedDate ?? '';
+
+    if (!dateConsumed) {
       setError('No date selected');
-    } else {
-      setError('No title selected');
+      return;
+    }
+
+    if (!selectedBook || !title) {
+      setError('Select a search result to add');
+      return;
+    }
+
+    setError('');
+
+    try {
+      await addBookToUser({ title, author, dateConsumed, datePublished });
+      onClose();
+    } catch (err) {
+      setError('Problem adding book');
     }
   };
 
-  const handleAddMovie = () => {
-    // TODO: addMovieToUser
-  };
+  const handleAddBookManual = async (event) => {
+    event.preventDefault();
 
-  const handleAddClicked =
-    selectedMediaType === 'book' ? handleAddBook : handleAddMovie;
+    const formData = new FormData(manualFormRef.current);
+    const title = formData.get('add-book-manual-title')?.toString().trim();
+    const author = formData.get('add-book-manual-author')?.toString().trim();
+    const dateConsumed = formData
+      .get('add-book-manual-date-consumed')
+      ?.toString();
+
+    if (!dateConsumed) {
+      setError('No date selected');
+      return;
+    }
+
+    if (!title) {
+      setError('Enter a title for manual entry');
+      return;
+    }
+
+    if (!author) {
+      setError('Enter an author for manual entry');
+      return;
+    }
+
+    setError('');
+
+    try {
+      await addBookToUser({ title, author, dateConsumed, datePublished: '' });
+      onClose();
+    } catch (err) {
+      setError('Problem adding book');
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -141,59 +190,120 @@ export const AddMediaDialog = (props) => {
             </Grid>
           </RadioGroup>
         </FormControl>
-        <Box component="form" ref={formRef} onSubmit={handleSearch}>
-          <Stack direction="row" display="flex" alignItems="center" spacing={3}>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                label="Date consumed"
-                id="add-book-form-date-consumed"
-                name="add-book-form-date-consumed"
-              />
-            </LocalizationProvider>
-            <TextField
-              id="add-book-form-title"
-              name="add-book-form-title"
-              label="Title"
-              variant="outlined"
-              sx={{ flexGrow: 1 }}
-            />
-            <Button variant="contained" type="submit">
-              Search
-            </Button>
+        {selectedMediaType === 'book' ? (
+          <Stack spacing={3}>
+            <Box component="form" ref={searchFormRef} onSubmit={handleSearch}>
+              <Typography variant="subtitle1" marginBottom={2}>
+                Search for a book
+              </Typography>
+              <Stack
+                direction={{ xs: 'column', md: 'row' }}
+                display="flex"
+                alignItems={{ xs: 'stretch', md: 'center' }}
+                spacing={2}
+              >
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    label="Date consumed"
+                    id="add-book-search-date-consumed"
+                    name="add-book-search-date-consumed"
+                  />
+                </LocalizationProvider>
+                <TextField
+                  id="add-book-search-title"
+                  name="add-book-search-title"
+                  label="Title"
+                  variant="outlined"
+                  sx={{ flexGrow: 1 }}
+                />
+                <Button variant="contained" type="submit">
+                  Search
+                </Button>
+              </Stack>
+              <RadioGroup
+                aria-label="search results"
+                name="search-results"
+                value={selectedResultId ?? ''}
+                onChange={handleSelectedResultChange}
+                sx={{ marginTop: 2 }}
+              >
+                {searchResults.map(({ id, volumeInfo }) => {
+                  return (
+                    <FormControlLabel
+                      key={id}
+                      value={id}
+                      control={<Radio />}
+                      label={
+                        <Typography>
+                          {volumeInfo.title} - {volumeInfo.authors?.join(', ')}
+                        </Typography>
+                      }
+                    />
+                  );
+                })}
+              </RadioGroup>
+              <Stack direction="row" justifyContent="flex-end" marginTop={2}>
+                <Button variant="contained" onClick={handleAddBookFromSearch}>
+                  Add selected book
+                </Button>
+              </Stack>
+            </Box>
+
+            <Divider>OR</Divider>
+
+            <Box
+              component="form"
+              ref={manualFormRef}
+              onSubmit={handleAddBookManual}
+            >
+              <Typography variant="subtitle1" marginBottom={2}>
+                Enter a book manually
+              </Typography>
+              <Stack spacing={2}>
+                <Stack
+                  direction={{ xs: 'column', md: 'row' }}
+                  alignItems={{ xs: 'stretch', md: 'center' }}
+                  spacing={2}
+                >
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      label="Date consumed"
+                      id="add-book-manual-date-consumed"
+                      name="add-book-manual-date-consumed"
+                    />
+                  </LocalizationProvider>
+                  <TextField
+                    id="add-book-manual-title"
+                    name="add-book-manual-title"
+                    label="Title"
+                    variant="outlined"
+                    sx={{ flexGrow: 1 }}
+                  />
+                  <TextField
+                    id="add-book-manual-author"
+                    name="add-book-manual-author"
+                    label="Author"
+                    variant="outlined"
+                    sx={{ flexGrow: 1 }}
+                  />
+                </Stack>
+                <Stack direction="row" justifyContent="flex-end">
+                  <Button variant="contained" type="submit">
+                    Add manual book
+                  </Button>
+                </Stack>
+              </Stack>
+            </Box>
           </Stack>
-        </Box>
-        <RadioGroup
-          aria-labelledby="demo-radio-buttons-group-label"
-          name="radio-buttons-group"
-          value={selectedResultId ?? ''}
-          onChange={handleSelectedResultChange}
-        >
-          {searchResults.map(({ id, volumeInfo }) => {
-            return (
-              <FormControlLabel
-                key={id}
-                value={id}
-                control={<Radio />}
-                label={
-                  <Typography>
-                    {volumeInfo.title} - {volumeInfo.authors?.join(', ')}
-                  </Typography>
-                }
-              />
-            );
-          })}
-        </RadioGroup>
+        ) : (
+          <Typography color="text.secondary">
+            Movie adding is coming soon.
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button color="default" onClick={onClose}>
           Cancel
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleAddClicked}
-          disabled={!selectedResultId}
-        >
-          Add
         </Button>
       </DialogActions>
     </Dialog>
