@@ -91,7 +91,7 @@ export const AddMediaDialog = (props) => {
       ?.toString();
 
     const title = selectedBook?.volumeInfo?.title;
-    const author = selectedBook?.volumeInfo?.authors?.join(', ');
+    const creator = selectedBook?.volumeInfo?.authors?.join(', ');
 
     if (!dateConsumed) {
       setError('No date selected');
@@ -107,7 +107,7 @@ export const AddMediaDialog = (props) => {
 
     await addBookMutation.mutateAsync({
       title,
-      author,
+      creator,
       dateConsumed,
     });
   };
@@ -117,7 +117,7 @@ export const AddMediaDialog = (props) => {
 
     const formData = new FormData(manualFormRef.current);
     const title = formData.get('add-book-manual-title')?.toString().trim();
-    const author = formData.get('add-book-manual-author')?.toString().trim();
+    const creator = formData.get('add-book-manual-creator')?.toString().trim();
     const dateConsumed = formData
       .get('add-book-manual-date-consumed')
       ?.toString();
@@ -132,8 +132,8 @@ export const AddMediaDialog = (props) => {
       return;
     }
 
-    if (!author) {
-      setError('Enter an author for manual entry');
+    if (!creator) {
+      setError('Enter a creator for manual entry');
       return;
     }
 
@@ -141,7 +141,7 @@ export const AddMediaDialog = (props) => {
 
     await addBookMutation.mutateAsync({
       title,
-      author,
+      creator,
       dateConsumed,
     });
   };
@@ -284,9 +284,9 @@ export const AddMediaDialog = (props) => {
                     sx={{ flexGrow: 1 }}
                   />
                   <TextField
-                    id="add-book-manual-author"
-                    name="add-book-manual-author"
-                    label="Author"
+                    id="add-book-manual-creator"
+                    name="add-book-manual-creator"
+                    label="Creator"
                     variant="outlined"
                     sx={{ flexGrow: 1 }}
                   />

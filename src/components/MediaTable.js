@@ -58,6 +58,8 @@ export const MediaTable = () => {
       id: row.id,
       mediaType: row.mediaType,
       dateConsumed: row.dateConsumed,
+      title: row.title ?? '',
+      creator: row.creator ?? row.author ?? row.producer ?? '',
     });
     editDateModal.open();
   };
@@ -86,8 +88,8 @@ export const MediaTable = () => {
     setMediaFilters(nextFilters);
   };
 
-  const handleSaveConsumedDate = async (dateConsumed) => {
-    if (!selectedEditMedia || !dateConsumed) {
+  const handleSaveMedia = async ({ dateConsumed, title, creator }) => {
+    if (!selectedEditMedia || !dateConsumed || !title || !creator) {
       return;
     }
 
@@ -95,7 +97,11 @@ export const MediaTable = () => {
       await updateMediaEntryMutation.mutateAsync({
         id: selectedEditMedia.id,
         mediaType: selectedEditMedia.mediaType,
-        data: { dateConsumed },
+        data: {
+          dateConsumed,
+          title,
+          creator,
+        },
       });
     } catch (err) {
       // TODO: show update error state
@@ -179,7 +185,7 @@ export const MediaTable = () => {
               <TableCell>Type</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Title</TableCell>
-              <TableCell>Author</TableCell>
+              <TableCell>Creator</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
@@ -196,7 +202,7 @@ export const MediaTable = () => {
                 <TableCell component="th" scope="row">
                   {row.title}
                 </TableCell>
-                <TableCell>{row.author ?? '-'}</TableCell>
+                <TableCell>{row.creator ?? '-'}</TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1}>
                     <IconButton onClick={handleEditClicked(row)}>
@@ -236,9 +242,11 @@ export const MediaTable = () => {
       <EditMediaDialog
         open={editDateModal.isOpen}
         onClose={editDateModal.close}
-        onSave={handleSaveConsumedDate}
+        onSave={handleSaveMedia}
         isSaving={updateMediaEntryMutation.isPending}
         initialDate={selectedEditMedia?.dateConsumed}
+        initialTitle={selectedEditMedia?.title}
+        initialCreator={selectedEditMedia?.creator}
       />
     </>
   );

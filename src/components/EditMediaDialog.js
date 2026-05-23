@@ -5,6 +5,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
+  TextField,
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -24,8 +26,18 @@ const toDateValue = (dateValue) => {
 };
 
 export const EditMediaDialog = (props) => {
-  const { open, onClose, onSave, isSaving = false, initialDate } = props;
+  const {
+    open,
+    onClose,
+    onSave,
+    isSaving = false,
+    initialDate,
+    initialTitle = '',
+    initialCreator = '',
+  } = props;
   const [selectedDate, setSelectedDate] = React.useState(null);
+  const [title, setTitle] = React.useState('');
+  const [creator, setCreator] = React.useState('');
 
   React.useEffect(() => {
     if (!open) {
@@ -33,27 +45,45 @@ export const EditMediaDialog = (props) => {
     }
 
     setSelectedDate(toDateValue(initialDate));
-  }, [initialDate, open]);
+    setTitle(initialTitle);
+    setCreator(initialCreator);
+  }, [initialCreator, initialDate, initialTitle, open]);
 
   const handleSave = () => {
-    if (!selectedDate) {
+    if (!selectedDate || !title.trim() || !creator.trim()) {
       return;
     }
 
-    onSave(new Date(selectedDate).toISOString());
+    onSave({
+      dateConsumed: new Date(selectedDate).toISOString(),
+      title: title.trim(),
+      creator: creator.trim(),
+    });
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Edit consumed date</DialogTitle>
+      <DialogTitle>Edit media</DialogTitle>
       <DialogContent dividers>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DatePicker
-            label="Date consumed"
-            value={selectedDate}
-            onChange={setSelectedDate}
+        <Stack spacing={2} marginTop={1}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              label="Date consumed"
+              value={selectedDate}
+              onChange={setSelectedDate}
+            />
+          </LocalizationProvider>
+          <TextField
+            label="Title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
           />
-        </LocalizationProvider>
+          <TextField
+            label="Creator"
+            value={creator}
+            onChange={(event) => setCreator(event.target.value)}
+          />
+        </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="default">
@@ -62,7 +92,9 @@ export const EditMediaDialog = (props) => {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!selectedDate || isSaving}
+          disabled={
+            !selectedDate || !title.trim() || !creator.trim() || isSaving
+          }
         >
           Save
         </Button>

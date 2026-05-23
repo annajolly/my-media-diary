@@ -15,11 +15,13 @@ export const getMediaEntries = async () => {
 
   const normalizedBooks = books.map((book) => ({
     ...book,
+    creator: book.creator ?? '',
     mediaType: 'book',
   }));
 
   const normalizedMovies = movies.map((movie) => ({
     ...movie,
+    creator: movie.creator ?? '',
     mediaType: 'movie',
   }));
 
