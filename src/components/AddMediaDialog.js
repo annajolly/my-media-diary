@@ -21,17 +21,28 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { BookIcon, FilmReelIcon } from '@phosphor-icons/react';
-import { searchBooksByTitle } from '../api/media';
+import {
+  getMovieDetails,
+  searchBooksByTitle,
+  searchMoviesByTitle,
+} from '../api/media';
 import { CustomRadio } from './CustomRadio';
-import { useAddBookMutation } from '../queries/mediaQueries';
+import {
+  useAddBookMutation,
+  useAddMovieMutation,
+} from '../queries/mediaQueries';
 
 export const AddMediaDialog = (props) => {
   const { open, onClose } = props;
   const [selectedMediaType, setSelectedMediaType] = React.useState('book');
-  const [searchResults, setSearchResults] = React.useState([]);
-  const [selectedResultId, setSelectedResultId] = React.useState(null);
+  const [bookSearchResults, setBookSearchResults] = React.useState([]);
+  const [selectedBookResultId, setSelectedBookResultId] = React.useState(null);
+  const [movieSearchResults, setMovieSearchResults] = React.useState([]);
+  const [selectedMovieResultId, setSelectedMovieResultId] =
+    React.useState(null);
   const [error, setError] = React.useState('');
-  const searchFormRef = React.useRef(null);
+  const bookSearchFormRef = React.useRef(null);
+  const movieSearchFormRef = React.useRef(null);
   const manualFormRef = React.useRef(null);
 
   const addBookMutation = useAddBookMutation({
@@ -43,13 +54,28 @@ export const AddMediaDialog = (props) => {
     },
   });
 
+  const addMovieMutation = useAddMovieMutation({
+    onSuccess: async () => {
+      onClose();
+    },
+    onError: () => {
+      setError('Problem adding movie');
+    },
+  });
+
   const handleChange = async (_, newType) => {
     setSelectedMediaType(newType);
+    setError('');
   };
 
   const handleSelectedResultChange = (e, result) => {
     console.log(result, e.target.value);
-    setSelectedResultId(result);
+    setSelectedBookResultId(result);
+  };
+
+  const handleSelectedMovieResultChange = (e, result) => {
+    console.log(result, e.target.value);
+    setSelectedMovieResultId(result);
   };
 
   const handleSearch = async (event) => {
@@ -59,7 +85,7 @@ export const AddMediaDialog = (props) => {
       return;
     }
 
-    const formData = new FormData(searchFormRef.current);
+    const formData = new FormData(bookSearchFormRef.current);
     const title = formData.get('add-book-search-title')?.toString().trim();
 
     if (!title) {
@@ -73,18 +99,44 @@ export const AddMediaDialog = (props) => {
 
     try {
       const books = await searchBooksByTitle(title);
-      setSearchResults(books);
-      setSelectedResultId(null);
+      setBookSearchResults(books);
+      setSelectedBookResultId(null);
+    } catch (err) {
+      setError('Problem loading media');
+    }
+  };
+
+  const handleMovieSearch = async (event) => {
+    event.preventDefault();
+
+    if (selectedMediaType !== 'movie') {
+      return;
+    }
+
+    const formData = new FormData(movieSearchFormRef.current);
+    const title = formData.get('add-movie-search-title')?.toString().trim();
+
+    if (!title) {
+      setError('Enter a title to search for a movie');
+      return;
+    }
+
+    setError('');
+
+    try {
+      const movies = await searchMoviesByTitle(title);
+      setMovieSearchResults(movies);
+      setSelectedMovieResultId(null);
     } catch (err) {
       setError('Problem loading media');
     }
   };
 
   const handleAddBookFromSearch = async () => {
-    const selectedBook = searchResults.find(
-      (result) => result.id === selectedResultId,
+    const selectedBook = bookSearchResults.find(
+      (result) => String(result.id) === String(selectedBookResultId),
     );
-    const formData = new FormData(searchFormRef.current);
+    const formData = new FormData(bookSearchFormRef.current);
 
     const dateConsumed = formData
       .get('add-book-search-date-consumed')
@@ -108,6 +160,38 @@ export const AddMediaDialog = (props) => {
     await addBookMutation.mutateAsync({
       title,
       creator,
+      dateConsumed,
+    });
+  };
+
+  const handleAddMovieFromSearch = async () => {
+    const selectedMovie = movieSearchResults.find(
+      (result) => String(result.id) === String(selectedMovieResultId),
+    );
+    const formData = new FormData(movieSearchFormRef.current);
+
+    const dateConsumed = formData
+      .get('add-movie-search-date-consumed')
+      ?.toString();
+
+    if (!dateConsumed) {
+      setError('No date selected');
+      return;
+    }
+
+    if (!selectedMovie) {
+      setError('Select a search result to add');
+      return;
+    }
+
+    setError('');
+
+    const details = await getMovieDetails(selectedMovie.id);
+
+    await addMovieMutation.mutateAsync({
+      title: details.title || selectedMovie.title,
+      creator: details.creator,
+      releaseDate: details.releaseDate || selectedMovie.releaseDate || '',
       dateConsumed,
     });
   };
@@ -192,7 +276,11 @@ export const AddMediaDialog = (props) => {
         </FormControl>
         {selectedMediaType === 'book' ? (
           <Stack spacing={3}>
-            <Box component="form" ref={searchFormRef} onSubmit={handleSearch}>
+            <Box
+              component="form"
+              ref={bookSearchFormRef}
+              onSubmit={handleSearch}
+            >
               <Typography variant="subtitle1" marginBottom={2}>
                 Search for a book
               </Typography>
@@ -223,11 +311,11 @@ export const AddMediaDialog = (props) => {
               <RadioGroup
                 aria-label="search results"
                 name="search-results"
-                value={selectedResultId ?? ''}
+                value={selectedBookResultId ?? ''}
                 onChange={handleSelectedResultChange}
                 sx={{ marginTop: 2 }}
               >
-                {searchResults.map(({ id, volumeInfo }) => {
+                {bookSearchResults.map(({ id, volumeInfo }) => {
                   return (
                     <FormControlLabel
                       key={id}
@@ -304,9 +392,73 @@ export const AddMediaDialog = (props) => {
             </Box>
           </Stack>
         ) : (
-          <Typography color="text.secondary">
-            Movie adding is coming soon.
-          </Typography>
+          <Stack spacing={3}>
+            <Box
+              component="form"
+              ref={movieSearchFormRef}
+              onSubmit={handleMovieSearch}
+            >
+              <Typography variant="subtitle1" marginBottom={2}>
+                Search for a movie
+              </Typography>
+              <Stack
+                direction={{ xs: 'column', md: 'row' }}
+                display="flex"
+                alignItems={{ xs: 'stretch', md: 'center' }}
+                spacing={2}
+              >
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    label="Date consumed"
+                    id="add-movie-search-date-consumed"
+                    name="add-movie-search-date-consumed"
+                  />
+                </LocalizationProvider>
+                <TextField
+                  id="add-movie-search-title"
+                  name="add-movie-search-title"
+                  label="Movie title"
+                  variant="outlined"
+                  sx={{ flexGrow: 1 }}
+                />
+                <Button variant="contained" type="submit">
+                  Search
+                </Button>
+              </Stack>
+              <RadioGroup
+                aria-label="movie search results"
+                name="movie-search-results"
+                value={selectedMovieResultId ?? ''}
+                onChange={handleSelectedMovieResultChange}
+                sx={{ marginTop: 2 }}
+              >
+                {movieSearchResults.map((movie) => {
+                  return (
+                    <FormControlLabel
+                      key={movie.id}
+                      value={movie.id}
+                      control={<Radio />}
+                      label={
+                        <Typography>
+                          {movie.title} -{' '}
+                          {movie.releaseDate || 'Unknown release date'}
+                        </Typography>
+                      }
+                    />
+                  );
+                })}
+              </RadioGroup>
+              <Stack direction="row" justifyContent="flex-end" marginTop={2}>
+                <Button
+                  variant="contained"
+                  onClick={handleAddMovieFromSearch}
+                  disabled={addMovieMutation.isPending}
+                >
+                  Add selected movie
+                </Button>
+              </Stack>
+            </Box>
+          </Stack>
         )}
       </DialogContent>
       <DialogActions>

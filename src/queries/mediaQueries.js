@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addBookEntry,
+  addMovieEntry,
   deleteMediaEntry,
   getMediaEntries,
   mediaEntriesQueryKey,
@@ -34,6 +35,21 @@ export const useAddBookMutation = (options = {}) => {
 
   return useMutation({
     mutationFn: addBookEntry,
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({ queryKey: mediaEntriesQueryKey });
+      if (options.onSuccess) {
+        await options.onSuccess(...args);
+      }
+    },
+    onError: options.onError,
+  });
+};
+
+export const useAddMovieMutation = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: addMovieEntry,
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({ queryKey: mediaEntriesQueryKey });
       if (options.onSuccess) {

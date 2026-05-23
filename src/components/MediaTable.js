@@ -59,7 +59,7 @@ export const MediaTable = () => {
       mediaType: row.mediaType,
       dateConsumed: row.dateConsumed,
       title: row.title ?? '',
-      creator: row.creator ?? row.author ?? row.producer ?? '',
+      creator: row.creator ?? '',
     });
     editDateModal.open();
   };
@@ -186,6 +186,7 @@ export const MediaTable = () => {
               <TableCell>Date</TableCell>
               <TableCell>Title</TableCell>
               <TableCell>Creator</TableCell>
+              <TableCell>Release date</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
@@ -203,6 +204,7 @@ export const MediaTable = () => {
                   {row.title}
                 </TableCell>
                 <TableCell>{row.creator ?? '-'}</TableCell>
+                <TableCell>{formatDateCell(row.releaseDate)}</TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1}>
                     <IconButton onClick={handleEditClicked(row)}>
@@ -217,6 +219,13 @@ export const MediaTable = () => {
                 </TableCell>
               </TableRow>
             ))}
+            {filteredMediaEntries.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                  No media entries match the selected filter.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
