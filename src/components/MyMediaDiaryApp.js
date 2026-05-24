@@ -7,7 +7,7 @@ import { Header } from './Header';
 import { MediaDiary } from './MediaDiary';
 import { useUserContext } from '../context/user-context';
 
-export const MyMediaDiaryApp = () => {
+export const MyMediaDiaryApp = ({ themeMode, onToggleThemeMode }) => {
   const { user, setUser } = useUserContext();
   const [isLoadingAuth, setIsLoadingAuth] = React.useState(true);
 
@@ -22,7 +22,7 @@ export const MyMediaDiaryApp = () => {
 
   return (
     <div className="App">
-      <Header />
+      <Header themeMode={themeMode} onToggleThemeMode={onToggleThemeMode} />
       {isLoadingAuth && (
         <Box
           display="flex"

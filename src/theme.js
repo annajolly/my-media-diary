@@ -1,47 +1,38 @@
 import { createTheme } from '@mui/material/styles';
 
-export const appTheme = createTheme({
-  typography: {
-    fontFamily: [
-      'Inter',
-      'Avenir Next',
-      'Avenir',
-      'Helvetica Neue',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-  },
+export const lightTheme = createTheme({
   palette: {
     mode: 'light',
-    primary: {
-      light: '#2f4c4d',
-      main: '#051F20',
-      dark: '#031516',
-      contrastText: '#ffffff',
-    },
-    secondary: {
-      light: '#7bc7c3',
-      main: '#0B5351',
-      dark: '#073f3d',
-      contrastText: '#ffffff',
-    },
-    background: {
-      default: '#f6f9f9',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#122223',
-      secondary: '#3e5253',
-    },
-    divider: '#b6c6c7',
+    primary: { main: '#0c1f1a', contrastText: '#ffffff' },
+    background: { default: '#f9f9fd', paper: '#ffffff' },
+    text: { primary: '#191c1e', secondary: '#41484d' },
+    divider: '#d9dade',
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-        },
-      },
-    },
+  typography: {
+    fontFamily: 'Inter, sans-serif',
+    h1: { fontWeight: 600 },
+    button: { textTransform: 'none' },
   },
+  shape: { borderRadius: 4 },
 });
+
+export const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#0c1f1a', contrastText: '#e2e2e6' },
+    background: { default: '#101415', paper: '#191c1e' },
+    text: { primary: '#e2e2e6', secondary: '#c2c7cc' },
+    divider: '#41484d',
+  },
+  typography: {
+    fontFamily: 'Chivo, sans-serif',
+    h1: { fontWeight: 600 },
+    button: { textTransform: 'none' },
+  },
+  shape: { borderRadius: 4 },
+});
+
+export const appTheme = {
+  light: lightTheme,
+  dark: darkTheme,
+};

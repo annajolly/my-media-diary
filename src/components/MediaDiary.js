@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Snackbar, Stack } from '@mui/material';
+import { Alert, Box, Button, Snackbar, Stack } from '@mui/material';
 import { DownloadSimpleIcon, PlusIcon } from '@phosphor-icons/react';
 import { useOpenable } from '../hooks/use-openable';
 import {
@@ -74,8 +74,8 @@ export const MediaDiary = () => {
   };
 
   return (
-    <Stack m={4} gap={2}>
-      <Stack direction="row" justifyContent="flex-end" gap={2}>
+    <Box>
+      <Stack direction="row" sx={{ justifyContent: 'flex-end', m: 2, gap: 2 }}>
         <Button
           startIcon={<PlusIcon />}
           variant="contained"
@@ -116,6 +116,6 @@ export const MediaDiary = () => {
           {snackbarState.message}
         </Alert>
       </Snackbar>
-    </Stack>
+    </Box>
   );
 };

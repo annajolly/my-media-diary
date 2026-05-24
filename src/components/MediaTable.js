@@ -194,7 +194,10 @@ export const MediaTable = () => {
 
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" marginBottom={2}>
+      <Stack
+        direction="row"
+        sx={{ justifyContent: 'flex-end', marginRight: 2, marginBottom: 2 }}
+      >
         <ToggleButtonGroup
           value={mediaFilters}
           onChange={handleMediaFilterChange}
