@@ -17,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
@@ -34,6 +35,8 @@ export const MediaTable = () => {
   const [selectedMedia, setSelectedMedia] = React.useState();
   const [selectedEditMedia, setSelectedEditMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
+  const [sortBy, setSortBy] = React.useState('dateConsumed');
+  const [sortDirection, setSortDirection] = React.useState('desc');
   const deleteConfirmModal = useOpenable();
   const editDateModal = useOpenable();
 
@@ -118,6 +121,48 @@ export const MediaTable = () => {
     );
   }, [mediaQuery.data, mediaFilters]);
 
+  const sortedMediaEntries = React.useMemo(() => {
+    const entries = [...filteredMediaEntries];
+
+    const normalizeValue = (entry, key) => {
+      if (key === 'dateConsumed' || key === 'releaseDate') {
+        const timestamp = new Date(entry[key]).getTime();
+        return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
+      }
+
+      return (entry[key] ?? '').toString().toLowerCase();
+    };
+
+    entries.sort((a, b) => {
+      const left = normalizeValue(a, sortBy);
+      const right = normalizeValue(b, sortBy);
+
+      if (left < right) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+
+      if (left > right) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    });
+
+    return entries;
+  }, [filteredMediaEntries, sortBy, sortDirection]);
+
+  const handleSort = (column) => () => {
+    if (sortBy === column) {
+      setSortDirection((previousDirection) =>
+        previousDirection === 'asc' ? 'desc' : 'asc',
+      );
+      return;
+    }
+
+    setSortBy(column);
+    setSortDirection('asc');
+  };
+
   const isLoading = mediaQuery.isPending;
 
   const formatDateCell = (dateValue) => {
@@ -182,16 +227,68 @@ export const MediaTable = () => {
         <Table sx={{ minWidth: 650 }} aria-label="media table">
           <TableHead>
             <TableRow>
-              <TableCell>Type</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Creator</TableCell>
-              <TableCell>Release date</TableCell>
+              <TableCell
+                sortDirection={sortBy === 'mediaType' ? sortDirection : false}
+              >
+                <TableSortLabel
+                  active={sortBy === 'mediaType'}
+                  direction={sortBy === 'mediaType' ? sortDirection : 'asc'}
+                  onClick={handleSort('mediaType')}
+                >
+                  Type
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={
+                  sortBy === 'dateConsumed' ? sortDirection : false
+                }
+              >
+                <TableSortLabel
+                  active={sortBy === 'dateConsumed'}
+                  direction={sortBy === 'dateConsumed' ? sortDirection : 'asc'}
+                  onClick={handleSort('dateConsumed')}
+                >
+                  Date
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={sortBy === 'title' ? sortDirection : false}
+              >
+                <TableSortLabel
+                  active={sortBy === 'title'}
+                  direction={sortBy === 'title' ? sortDirection : 'asc'}
+                  onClick={handleSort('title')}
+                >
+                  Title
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={sortBy === 'creator' ? sortDirection : false}
+              >
+                <TableSortLabel
+                  active={sortBy === 'creator'}
+                  direction={sortBy === 'creator' ? sortDirection : 'asc'}
+                  onClick={handleSort('creator')}
+                >
+                  Creator
+                </TableSortLabel>
+              </TableCell>
+              <TableCell
+                sortDirection={sortBy === 'releaseDate' ? sortDirection : false}
+              >
+                <TableSortLabel
+                  active={sortBy === 'releaseDate'}
+                  direction={sortBy === 'releaseDate' ? sortDirection : 'asc'}
+                  onClick={handleSort('releaseDate')}
+                >
+                  Release date
+                </TableSortLabel>
+              </TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredMediaEntries?.map((row) => (
+            {sortedMediaEntries?.map((row) => (
               <TableRow
                 key={`${row.mediaType}-${row.id}`}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -219,7 +316,7 @@ export const MediaTable = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {filteredMediaEntries.length === 0 && (
+            {sortedMediaEntries.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
                   No media entries match the selected filter.
