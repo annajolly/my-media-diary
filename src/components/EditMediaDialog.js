@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -62,7 +63,15 @@ export const EditMediaDialog = (props) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          minWidth: 'min(350px, calc(100% - 48px))',
+        },
+      }}
+    >
       <DialogTitle>Edit media</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2} marginTop={1}>
@@ -95,8 +104,11 @@ export const EditMediaDialog = (props) => {
           disabled={
             !selectedDate || !title.trim() || !creator.trim() || isSaving
           }
+          startIcon={
+            isSaving ? <CircularProgress size={16} color="inherit" /> : null
+          }
         >
-          Save
+          {isSaving ? 'Saving...' : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

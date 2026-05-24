@@ -45,6 +45,23 @@ export const AddMediaDialog = (props) => {
   const movieSearchFormRef = React.useRef(null);
   const manualFormRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    setSelectedMediaType('book');
+    setBookSearchResults([]);
+    setSelectedBookResultId(null);
+    setMovieSearchResults([]);
+    setSelectedMovieResultId(null);
+    setError('');
+
+    bookSearchFormRef.current?.reset();
+    movieSearchFormRef.current?.reset();
+    manualFormRef.current?.reset();
+  }, [open]);
+
   const addBookMutation = useAddBookMutation({
     onSuccess: async () => {
       onClose();
@@ -235,7 +252,7 @@ export const AddMediaDialog = (props) => {
       <DialogTitle>Add media</DialogTitle>
       {error && <Alert severity="error">{error}</Alert>}
       <DialogContent dividers>
-        <FormControl sx={{ width: '100%', marginY: 4, height: '100px' }}>
+        <FormControl sx={{ width: '100%', marginY: 1, height: '100px' }}>
           <RadioGroup
             row
             aria-label="media type"
@@ -247,7 +264,6 @@ export const AddMediaDialog = (props) => {
               container
               columnSpacing={{ xs: 1, sm: 2, md: 3 }}
               width="100%"
-              marginX={3}
             >
               <Grid size={6}>
                 <CustomRadio
