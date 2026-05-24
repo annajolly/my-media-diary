@@ -1,8 +1,14 @@
 import React from 'react';
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
+import {
+  BookIcon,
+  FilmReelIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+} from '@phosphor-icons/react';
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -20,6 +26,9 @@ import {
   TableSortLabel,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
+  useTheme,
+  TablePagination,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { useOpenable } from '../hooks/use-openable';
@@ -32,6 +41,7 @@ import {
 import { EditMediaDialog } from './EditMediaDialog';
 
 export const MediaTable = () => {
+  const theme = useTheme();
   const [selectedMedia, setSelectedMedia] = React.useState();
   const [selectedEditMedia, setSelectedEditMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
@@ -151,6 +161,14 @@ export const MediaTable = () => {
     return entries;
   }, [filteredMediaEntries, sortBy, sortDirection]);
 
+  // Pagination state and logic (must come after sortedMediaEntries)
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const paginatedMediaEntries = React.useMemo(() => {
+    const start = page * rowsPerPage;
+    return sortedMediaEntries.slice(start, start + rowsPerPage);
+  }, [sortedMediaEntries, page, rowsPerPage]);
+
   const handleSort = (column) => () => {
     if (sortBy === column) {
       setSortDirection((previousDirection) =>
@@ -192,6 +210,15 @@ export const MediaTable = () => {
     );
   }
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <>
       <Stack
@@ -226,7 +253,7 @@ export const MediaTable = () => {
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={0}>
         <Table sx={{ minWidth: 650 }} aria-label="media table">
           <TableHead>
             <TableRow>
@@ -291,21 +318,43 @@ export const MediaTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedMediaEntries?.map((row) => (
+            {paginatedMediaEntries?.map((row) => (
               <TableRow
                 key={`${row.mediaType}-${row.id}`}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell sx={{ textTransform: 'capitalize' }}>
-                  {row.mediaType}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {row.mediaType === 'book' ? (
+                      <BookIcon width={18} height={18} color="#04b4a2" />
+                    ) : (
+                      <FilmReelIcon width={18} height={18} color="#04b4a2" />
+                    )}
+                    <Chip
+                      label={row.mediaType.toUpperCase()}
+                      size="small"
+                      sx={{
+                        borderRadius: '2px',
+                        height: '20px',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        backgroundColor: '#04b4a2',
+                        color: '#003731',
+                        border: '1px solid rgba(0, 188, 212, 0.3)',
+                        '& .MuiChip-label': { padding: '0 6px' },
+                      }}
+                    />
+                  </Box>
                 </TableCell>
                 <TableCell>{formatDateCell(row.dateConsumed)}</TableCell>
                 <TableCell component="th" scope="row">
-                  {row.title}
+                  <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                    {row.title}
+                  </Typography>
                 </TableCell>
                 <TableCell>{row.creator ?? '-'}</TableCell>
                 <TableCell>{formatDateCell(row.releaseDate)}</TableCell>
-                <TableCell align="center">
+                <TableCell align="right">
                   <Stack direction="row" spacing={1}>
                     <IconButton onClick={handleEditClicked(row)}>
                       <PencilSimpleIcon size={20} />
@@ -329,6 +378,15 @@ export const MediaTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        component="div"
+        count={sortedMediaEntries.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+      />
       <Dialog open={deleteConfirmModal.isOpen}>
         <DialogTitle>Confirm</DialogTitle>
         <DialogContent dividers>
