@@ -155,9 +155,7 @@ export const AddMediaDialog = (props) => {
     );
     const formData = new FormData(bookSearchFormRef.current);
 
-    const dateConsumed = formData
-      .get('add-book-search-date-consumed')
-      ?.toString();
+    const dateConsumed = formData.get('add-media-date-consumed')?.toString();
 
     const title = selectedBook?.volumeInfo?.title;
     const creator = selectedBook?.volumeInfo?.authors?.join(', ');
@@ -187,9 +185,7 @@ export const AddMediaDialog = (props) => {
     );
     const formData = new FormData(movieSearchFormRef.current);
 
-    const dateConsumed = formData
-      .get('add-movie-search-date-consumed')
-      ?.toString();
+    const dateConsumed = formData.get('add-media-date-consumed')?.toString();
 
     if (!dateConsumed) {
       setError('No date selected');
@@ -219,9 +215,7 @@ export const AddMediaDialog = (props) => {
     const formData = new FormData(manualFormRef.current);
     const title = formData.get('add-book-manual-title')?.toString().trim();
     const creator = formData.get('add-book-manual-creator')?.toString().trim();
-    const dateConsumed = formData
-      .get('add-book-manual-date-consumed')
-      ?.toString();
+    const dateConsumed = formData.get('add-media-date-consumed')?.toString();
 
     if (!dateConsumed) {
       setError('No date selected');
@@ -252,6 +246,13 @@ export const AddMediaDialog = (props) => {
       <DialogTitle>Add media</DialogTitle>
       {error && <Alert severity="error">{error}</Alert>}
       <DialogContent dividers>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            label="Date consumed"
+            id="add-media-date-consumed"
+            name="add-media-date-consumed"
+          />
+        </LocalizationProvider>
         <FormControl sx={{ width: '100%', marginY: 1, height: '100px' }}>
           <RadioGroup
             row
@@ -263,13 +264,16 @@ export const AddMediaDialog = (props) => {
             <Grid
               container
               columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-              width="100%"
+              sx={{ width: '100%' }}
             >
               <Grid size={6}>
                 <CustomRadio
                   value="book"
                   label={
-                    <Stack gap={2} direction="row" alignItems="center">
+                    <Stack
+                      direction="row"
+                      sx={{ gap: 2, alignItems: 'center' }}
+                    >
                       <BookIcon size={32} weight="fill" />
                       <Typography variant="h6">Book</Typography>
                     </Stack>
@@ -280,7 +284,10 @@ export const AddMediaDialog = (props) => {
                 <CustomRadio
                   value="movie"
                   label={
-                    <Stack gap={2} direction="row" alignItems="center">
+                    <Stack
+                      direction="row"
+                      sx={{ gap: 2, alignItems: 'center' }}
+                    >
                       <FilmReelIcon size={32} weight="fill" />
                       <Typography variant="h6">Movie</Typography>
                     </Stack>
@@ -297,7 +304,17 @@ export const AddMediaDialog = (props) => {
               ref={bookSearchFormRef}
               onSubmit={handleSearch}
             >
-              <Typography variant="subtitle1" marginBottom={2}>
+              <Typography
+                variant="overline"
+                sx={{
+                  fontFamily: 'Chivo, sans-serif',
+                  fontWeight: 700,
+                  color: '#c2c7cc',
+                  letterSpacing: '0.05em',
+                  display: 'block',
+                  mb: 1.5,
+                }}
+              >
                 Search for a book
               </Typography>
               <Stack
@@ -306,13 +323,6 @@ export const AddMediaDialog = (props) => {
                 alignItems={{ xs: 'stretch', md: 'center' }}
                 spacing={2}
               >
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    label="Date consumed"
-                    id="add-book-search-date-consumed"
-                    name="add-book-search-date-consumed"
-                  />
-                </LocalizationProvider>
                 <TextField
                   id="add-book-search-title"
                   name="add-book-search-title"
@@ -364,7 +374,17 @@ export const AddMediaDialog = (props) => {
               ref={manualFormRef}
               onSubmit={handleAddBookManual}
             >
-              <Typography variant="subtitle1" marginBottom={2}>
+              <Typography
+                variant="overline"
+                sx={{
+                  fontFamily: 'Chivo, sans-serif',
+                  fontWeight: 700,
+                  color: '#c2c7cc',
+                  letterSpacing: '0.05em',
+                  display: 'block',
+                  mb: 1.5,
+                }}
+              >
                 Enter a book manually
               </Typography>
               <Stack spacing={2}>
@@ -373,13 +393,6 @@ export const AddMediaDialog = (props) => {
                   alignItems={{ xs: 'stretch', md: 'center' }}
                   spacing={2}
                 >
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DatePicker
-                      label="Date consumed"
-                      id="add-book-manual-date-consumed"
-                      name="add-book-manual-date-consumed"
-                    />
-                  </LocalizationProvider>
                   <TextField
                     id="add-book-manual-title"
                     name="add-book-manual-title"
@@ -414,7 +427,17 @@ export const AddMediaDialog = (props) => {
               ref={movieSearchFormRef}
               onSubmit={handleMovieSearch}
             >
-              <Typography variant="subtitle1" marginBottom={2}>
+              <Typography
+                variant="overline"
+                sx={{
+                  fontFamily: 'Chivo, sans-serif',
+                  fontWeight: 700,
+                  color: '#c2c7cc',
+                  letterSpacing: '0.05em',
+                  display: 'block',
+                  mb: 1.5,
+                }}
+              >
                 Search for a movie
               </Typography>
               <Stack
@@ -423,13 +446,6 @@ export const AddMediaDialog = (props) => {
                 alignItems={{ xs: 'stretch', md: 'center' }}
                 spacing={2}
               >
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    label="Date consumed"
-                    id="add-movie-search-date-consumed"
-                    name="add-movie-search-date-consumed"
-                  />
-                </LocalizationProvider>
                 <TextField
                   id="add-movie-search-title"
                   name="add-movie-search-title"

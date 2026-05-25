@@ -253,7 +253,7 @@ export const MediaTable = () => {
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
-      <TableContainer component={Paper} elevation={0}>
+      <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
         <Table sx={{ minWidth: 650 }} aria-label="media table">
           <TableHead>
             <TableRow>
@@ -321,7 +321,9 @@ export const MediaTable = () => {
             {paginatedMediaEntries?.map((row) => (
               <TableRow
                 key={`${row.mediaType}-${row.id}`}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                sx={{
+                  '&:last-child td, &:last-child th': { border: 0 },
+                }}
               >
                 <TableCell sx={{ textTransform: 'capitalize' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -347,8 +349,13 @@ export const MediaTable = () => {
                   </Box>
                 </TableCell>
                 <TableCell>{formatDateCell(row.dateConsumed)}</TableCell>
-                <TableCell component="th" scope="row">
-                  <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                <TableCell>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                    }}
+                  >
                     {row.title}
                   </Typography>
                 </TableCell>
@@ -370,7 +377,11 @@ export const MediaTable = () => {
             ))}
             {sortedMediaEntries.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                <TableCell
+                  colSpan={6}
+                  align="center"
+                  sx={{ py: 6, border: 'none' }}
+                >
                   No media entries match the selected filter.
                 </TableCell>
               </TableRow>

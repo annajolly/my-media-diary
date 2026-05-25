@@ -26,11 +26,11 @@ const Label = styled(Box, { shouldForwardProp: (prop) => prop !== 'isActive' })(
     },
 
     ...(isActive && {
-      color: theme.palette.primary.main,
-      borderColor: 'transparent',
-      boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
+      backgroundColor: '#182427',
+      color: theme.palette.secondary.light,
+      boxShadow: `0 0 0 2px ${theme.palette.secondary.light}`,
     }),
-  })
+  }),
 );
 
 // const useStyles = makeStyles(({ shape, palette, spacing, transitions }) => ({

@@ -45,7 +45,18 @@ export const Header = ({ themeMode = 'light', onToggleThemeMode }) => {
             <Avatar sx={{ bgcolor: 'rgb(250, 240, 230)' }}>
               <MyMediaDiaryLogo />
             </Avatar>
-            <Typography variant="h6" sx={{ color: 'rgb(250, 240, 230)' }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: 'Chivo, sans-serif',
+                fontWeight: 700,
+                fontSize: '1.25rem',
+                color: 'rgb(250, 240, 230)',
+                letterSpacing: '-0.01em',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               MyMediaDiary
             </Typography>
           </Stack>
