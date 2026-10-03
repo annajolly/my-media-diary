@@ -66,10 +66,10 @@ export const searchBooksByTitle = async (title) => {
   const booksApiUrl = new URL('https://www.googleapis.com/books/v1/volumes');
   booksApiUrl.searchParams.set('q', query);
 
-  if (process.env.REACT_APP_GOOGLE_BOOKS_API_KEY) {
+  if (import.meta.env.VITE_GOOGLE_BOOKS_API_KEY) {
     booksApiUrl.searchParams.set(
       'key',
-      process.env.REACT_APP_GOOGLE_BOOKS_API_KEY,
+      import.meta.env.VITE_GOOGLE_BOOKS_API_KEY,
     );
   }
 
@@ -83,7 +83,7 @@ export const searchBooksByTitle = async (title) => {
 };
 
 const getTmdbApiKey = () => {
-  const apiKey = process.env.REACT_APP_TMDB_API_KEY;
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   if (!apiKey) {
     throw new Error('TMDB API key is missing');
   }
