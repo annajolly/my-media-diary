@@ -6,6 +6,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react';
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -252,6 +253,9 @@ export const MediaTable = () => {
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
+      {mediaQuery.isError && (
+        <Alert severity="error">{mediaQuery.error.toString()}</Alert>
+      )}
       <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
         <Table sx={{ minWidth: 650 }} aria-label="media table">
           <TableHead>
