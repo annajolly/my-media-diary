@@ -9,7 +9,7 @@ import {
 import { AddMediaDialog } from './AddMediaDialog';
 import { ImportMediaDialog } from './ImportMediaDialog';
 
-export const FilterBar = () => {
+export const PageHeader = () => {
   const addMediaDialog = useOpenable();
   const importMediaDialog = useOpenable();
   const [snackbarState, setSnackbarState] = React.useState({
@@ -74,8 +74,12 @@ export const FilterBar = () => {
 
   return (
     <>
-      <Stack direction="row" sx={{ justifyContent: 'flex-end', m: 2, gap: 2 }}>
+      <Stack
+        direction="row"
+        sx={{ justifyContent: 'flex-end', alignItems: 'center', m: 2, gap: 2 }}
+      >
         <Button
+          size="small"
           startIcon={<PlusIcon />}
           variant="contained"
           onClick={addMediaDialog.open}
@@ -83,6 +87,7 @@ export const FilterBar = () => {
           Add media
         </Button>
         <Button
+          size="small"
           startIcon={<DownloadSimpleIcon />}
           variant="contained"
           onClick={importMediaDialog.open}

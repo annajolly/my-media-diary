@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { FilterBar } from './FilterBar';
+import { PageHeader } from './PageHeader';
 import { MediaTable } from './MediaTable';
 
 export const MediaDiary = () => {
   return (
-    <Box>
-      <FilterBar />
+    <Box sx={{ px: { xs: 0, md: 4 } }}>
+      <PageHeader />
       <MediaTable />
     </Box>
   );

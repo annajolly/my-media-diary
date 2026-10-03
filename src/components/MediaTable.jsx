@@ -3,13 +3,16 @@ import {
   BookIcon,
   FilmReelIcon,
   MagicWandIcon,
+  MagnifyingGlassIcon,
   PencilSimpleIcon,
   TrashIcon,
+  XIcon,
 } from '@phosphor-icons/react';
 import {
   Alert,
   Box,
   Button,
+  Card,
   Chip,
   CircularProgress,
   Dialog,
@@ -17,6 +20,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -26,6 +30,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -50,6 +55,7 @@ export const MediaTable = () => {
   const [selectedMedia, setSelectedMedia] = React.useState();
   const [selectedEditMedia, setSelectedEditMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
+  const [searchText, setSearchText] = React.useState('');
   const [sortBy, setSortBy] = React.useState('dateConsumed');
   const [sortDirection, setSortDirection] = React.useState('desc');
   const deleteConfirmModal = useOpenable();
@@ -141,10 +147,22 @@ export const MediaTable = () => {
       return [];
     }
 
-    return mediaQuery.data.filter((entry) =>
-      mediaFilters.includes(entry.mediaType),
-    );
-  }, [mediaQuery.data, mediaFilters]);
+    const searchTerm = searchText.trim().toLowerCase();
+
+    return mediaQuery.data.filter((entry) => {
+      if (!mediaFilters.includes(entry.mediaType)) {
+        return false;
+      }
+
+      if (!searchTerm) {
+        return true;
+      }
+
+      return [entry.title, entry.creator, getReleaseYear(entry.releaseDate)]
+        .filter(Boolean)
+        .some((value) => value.toString().toLowerCase().includes(searchTerm));
+    });
+  }, [mediaQuery.data, mediaFilters, searchText]);
 
   const sortedMediaEntries = React.useMemo(() => {
     const entries = [...filteredMediaEntries];
@@ -195,6 +213,17 @@ export const MediaTable = () => {
   // Pagination state and logic (must come after sortedMediaEntries)
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+    setPage(0);
+  };
+
+  const handleClearSearch = () => {
+    setSearchText('');
+    setPage(0);
+  };
+
   const paginatedMediaEntries = React.useMemo(() => {
     const start = page * rowsPerPage;
     return sortedMediaEntries.slice(start, start + rowsPerPage);
@@ -253,55 +282,104 @@ export const MediaTable = () => {
 
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: 2,
-          marginRight: 2,
-          marginBottom: 2,
-        }}
-      >
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<MagicWandIcon />}
-          onClick={handleAutoFillClicked}
-          disabled={entriesMissingMetadata.length === 0}
-        >
-          Auto-fill metadata
-          {entriesMissingMetadata.length > 0 &&
-            ` (${entriesMissingMetadata.length})`}
-        </Button>
-        <ToggleButtonGroup
-          value={mediaFilters}
-          onChange={handleMediaFilterChange}
-          aria-label="Filter media types"
-          size="small"
+      <Card sx={{ mb: 2 }}>
+        <Stack
+          direction="row"
           sx={{
-            '& .MuiToggleButton-root': {
-              textTransform: 'none',
-            },
-            '& .MuiToggleButton-root.Mui-selected': {
-              backgroundColor: (theme) =>
-                alpha(theme.palette.primary.main, 0.88),
-              color: 'primary.contrastText',
-            },
-            '& .MuiToggleButton-root.Mui-selected:hover': {
-              backgroundColor: (theme) =>
-                alpha(theme.palette.primary.main, 0.95),
-            },
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+            p: 2,
           }}
         >
-          <ToggleButton value="book" aria-label="Show books">
-            Book
-          </ToggleButton>
-          <ToggleButton value="movie" aria-label="Show movies">
-            Movie
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Stack>
+          <ToggleButtonGroup
+            value={mediaFilters}
+            onChange={handleMediaFilterChange}
+            aria-label="Filter media types"
+            size="small"
+            sx={{
+              '& .MuiToggleButton-root': {
+                textTransform: 'none',
+                // MUI's "small" toggle buttons are still ~39px tall; match the
+                // ~31px of a small Button (3px + 1px border, like outlined).
+                py: '3px',
+                px: 1.25,
+              },
+              '& .MuiToggleButton-root.Mui-selected': {
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.primary.main, 0.88),
+                color: 'primary.contrastText',
+              },
+              '& .MuiToggleButton-root.Mui-selected:hover': {
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.primary.main, 0.95),
+              },
+            }}
+          >
+            <ToggleButton value="book" aria-label="Show books">
+              Book
+            </ToggleButton>
+            <ToggleButton value="movie" aria-label="Show movies">
+              Movie
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Stack
+            direction="row"
+            sx={{
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            <TextField
+              size="small"
+              placeholder="Search title, creator or year"
+              value={searchText}
+              onChange={handleSearchChange}
+              sx={{
+                width: { xs: 180, sm: 280 },
+                // Match the small buttons beside it: 13px text, and input
+                // padding trimmed so the field is ~31px instead of 40px.
+                '& .MuiInputBase-root': { fontSize: '0.8125rem' },
+                '& .MuiInputBase-input': { py: '6px' },
+              }}
+              slotProps={{
+                htmlInput: { 'aria-label': 'Search media' },
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <MagnifyingGlassIcon size={18} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchText ? (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        edge="end"
+                        aria-label="Clear search"
+                        onClick={handleClearSearch}
+                      >
+                        <XIcon size={16} />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<MagicWandIcon />}
+              onClick={handleAutoFillClicked}
+              disabled={entriesMissingMetadata.length === 0}
+            >
+              Auto-fill metadata
+              {entriesMissingMetadata.length > 0 &&
+                ` (${entriesMissingMetadata.length})`}
+            </Button>
+          </Stack>
+        </Stack>
+      </Card>
       {mediaQuery.isError && (
         <Alert severity="error">{mediaQuery.error.toString()}</Alert>
       )}
@@ -429,7 +507,9 @@ export const MediaTable = () => {
                   align="center"
                   sx={{ py: 6, border: 'none' }}
                 >
-                  No media entries match the selected filter.
+                  {searchText.trim()
+                    ? 'No media entries match your search.'
+                    : 'No media entries match the selected filter.'}
                 </TableCell>
               </TableRow>
             )}
