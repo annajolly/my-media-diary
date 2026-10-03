@@ -2,6 +2,7 @@ import React from 'react';
 import {
   BookIcon,
   FilmReelIcon,
+  MagicWandIcon,
   PencilSimpleIcon,
   TrashIcon,
 } from '@phosphor-icons/react';
@@ -39,6 +40,11 @@ import {
   useUpdateMediaEntryMutation,
 } from '../queries/mediaQueries';
 import { EditMediaDialog } from './EditMediaDialog';
+import { getReleaseYear } from '../utils/release-year';
+import {
+  AutoFillMetadataDialog,
+  hasMissingMetadata,
+} from './AutoFillMetadataDialog';
 
 export const MediaTable = () => {
   const [selectedMedia, setSelectedMedia] = React.useState();
@@ -48,6 +54,9 @@ export const MediaTable = () => {
   const [sortDirection, setSortDirection] = React.useState('desc');
   const deleteConfirmModal = useOpenable();
   const editDateModal = useOpenable();
+  const autoFillModal = useOpenable();
+  const [autoFillEntries, setAutoFillEntries] = React.useState([]);
+  const [autoFillSession, setAutoFillSession] = React.useState(0);
 
   const mediaQuery = useMediaEntriesQuery();
 
@@ -72,6 +81,7 @@ export const MediaTable = () => {
       dateConsumed: row.dateConsumed,
       title: row.title ?? '',
       creator: row.creator ?? '',
+      releaseDate: row.releaseDate ?? '',
     });
     editDateModal.open();
   };
@@ -100,7 +110,12 @@ export const MediaTable = () => {
     setMediaFilters(nextFilters);
   };
 
-  const handleSaveMedia = async ({ dateConsumed, title, creator }) => {
+  const handleSaveMedia = async ({
+    dateConsumed,
+    title,
+    creator,
+    releaseDate,
+  }) => {
     if (!selectedEditMedia || !dateConsumed || !title || !creator) {
       return;
     }
@@ -113,6 +128,7 @@ export const MediaTable = () => {
           dateConsumed,
           title,
           creator,
+          releaseDate,
         },
       });
     } catch (err) {
@@ -134,7 +150,11 @@ export const MediaTable = () => {
     const entries = [...filteredMediaEntries];
 
     const normalizeValue = (entry, key) => {
-      if (key === 'dateConsumed' || key === 'releaseDate') {
+      if (key === 'releaseDate') {
+        return getReleaseYear(entry.releaseDate) ?? Number.NEGATIVE_INFINITY;
+      }
+
+      if (key === 'dateConsumed') {
         const timestamp = new Date(entry[key]).getTime();
         return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp;
       }
@@ -159,6 +179,18 @@ export const MediaTable = () => {
 
     return entries;
   }, [filteredMediaEntries, sortBy, sortDirection]);
+
+  const entriesMissingMetadata = React.useMemo(
+    () => sortedMediaEntries.filter(hasMissingMetadata),
+    [sortedMediaEntries],
+  );
+
+  const handleAutoFillClicked = () => {
+    // Snapshot the list so steps don't shift as entries get updated.
+    setAutoFillEntries(entriesMissingMetadata);
+    setAutoFillSession((session) => session + 1);
+    autoFillModal.open();
+  };
 
   // Pagination state and logic (must come after sortedMediaEntries)
   const [page, setPage] = React.useState(0);
@@ -223,8 +255,25 @@ export const MediaTable = () => {
     <>
       <Stack
         direction="row"
-        sx={{ justifyContent: 'flex-end', marginRight: 2, marginBottom: 2 }}
+        sx={{
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: 2,
+          marginRight: 2,
+          marginBottom: 2,
+        }}
       >
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<MagicWandIcon />}
+          onClick={handleAutoFillClicked}
+          disabled={entriesMissingMetadata.length === 0}
+        >
+          Auto-fill metadata
+          {entriesMissingMetadata.length > 0 &&
+            ` (${entriesMissingMetadata.length})`}
+        </Button>
         <ToggleButtonGroup
           value={mediaFilters}
           onChange={handleMediaFilterChange}
@@ -314,7 +363,7 @@ export const MediaTable = () => {
                   direction={sortBy === 'releaseDate' ? sortDirection : 'asc'}
                   onClick={handleSort('releaseDate')}
                 >
-                  Release date
+                  Release year
                 </TableSortLabel>
               </TableCell>
               <TableCell />
@@ -358,7 +407,7 @@ export const MediaTable = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>{row.creator ?? '-'}</TableCell>
-                <TableCell>{formatDateCell(row.releaseDate)}</TableCell>
+                <TableCell>{getReleaseYear(row.releaseDate) ?? '-'}</TableCell>
                 <TableCell align="right">
                   <Stack direction="row" spacing={1}>
                     <IconButton onClick={handleEditClicked(row)}>
@@ -423,6 +472,13 @@ export const MediaTable = () => {
         initialDate={selectedEditMedia?.dateConsumed}
         initialTitle={selectedEditMedia?.title}
         initialCreator={selectedEditMedia?.creator}
+        initialReleaseDate={selectedEditMedia?.releaseDate}
+      />
+      <AutoFillMetadataDialog
+        key={autoFillSession}
+        open={autoFillModal.isOpen}
+        onClose={autoFillModal.close}
+        entries={autoFillEntries}
       />
     </>
   );

@@ -23,10 +23,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { BookIcon, FilmReelIcon } from '@phosphor-icons/react';
 import {
   getMovieDetails,
-  searchBooksByTitle,
+  searchBooksByTerm,
   searchMoviesByTitle,
 } from '../api/media';
+import { getReleaseYear } from '../utils/release-year';
 import { CustomRadio } from './CustomRadio';
+import { MoviePoster } from './MoviePoster';
 import {
   useAddBookMutation,
   useAddMovieMutation,
@@ -115,7 +117,7 @@ export const AddMediaDialog = (props) => {
     console.log(title);
 
     try {
-      const books = await searchBooksByTitle(title);
+      const books = await searchBooksByTerm(title);
       setBookSearchResults(books);
       setSelectedBookResultId(null);
     } catch (err) {
@@ -474,11 +476,29 @@ export const AddMediaDialog = (props) => {
                       value={movie.id}
                       control={<Radio />}
                       label={
-                        <Typography>
-                          {movie.title} -{' '}
-                          {movie.releaseDate || 'Unknown release date'}
-                        </Typography>
+                        <Stack
+                          direction="row"
+                          sx={{ gap: 2, alignItems: 'center' }}
+                        >
+                          <Typography sx={{ flex: 1, minWidth: 0 }}>
+                            {movie.title} -{' '}
+                            {getReleaseYear(movie.releaseDate) ??
+                              'Unknown release year'}
+                          </Typography>
+                          <MoviePoster
+                            src={movie.posterUrl}
+                            title={movie.title}
+                          />
+                        </Stack>
                       }
+                      sx={{
+                        mr: 0,
+                        py: 0.5,
+                        '& .MuiFormControlLabel-label': {
+                          flex: 1,
+                          minWidth: 0,
+                        },
+                      }}
                     />
                   );
                 })}

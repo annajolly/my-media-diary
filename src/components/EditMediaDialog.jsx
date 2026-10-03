@@ -12,6 +12,22 @@ import {
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { getReleaseYear } from '../utils/release-year';
+
+const MAX_RELEASE_YEAR = new Date().getFullYear() + 10;
+
+const getReleaseYearError = (releaseYear) => {
+  if (!releaseYear) {
+    return '';
+  }
+
+  const year = Number(releaseYear);
+  if (releaseYear.length !== 4 || year < 1000 || year > MAX_RELEASE_YEAR) {
+    return `Enter a 4-digit year up to ${MAX_RELEASE_YEAR}`;
+  }
+
+  return '';
+};
 
 const toDateValue = (dateValue) => {
   if (!dateValue) {
@@ -35,10 +51,16 @@ export const EditMediaDialog = (props) => {
     initialDate,
     initialTitle = '',
     initialCreator = '',
+    initialReleaseDate = '',
   } = props;
   const [selectedDate, setSelectedDate] = React.useState(null);
   const [title, setTitle] = React.useState('');
   const [creator, setCreator] = React.useState('');
+  const [releaseYear, setReleaseYear] = React.useState('');
+
+  const initialReleaseYear =
+    getReleaseYear(initialReleaseDate)?.toString() ?? '';
+  const releaseYearError = getReleaseYearError(releaseYear);
 
   React.useEffect(() => {
     if (!open) {
@@ -48,10 +70,11 @@ export const EditMediaDialog = (props) => {
     setSelectedDate(toDateValue(initialDate));
     setTitle(initialTitle);
     setCreator(initialCreator);
-  }, [initialCreator, initialDate, initialTitle, open]);
+    setReleaseYear(initialReleaseYear);
+  }, [initialCreator, initialDate, initialReleaseYear, initialTitle, open]);
 
   const handleSave = () => {
-    if (!selectedDate || !title.trim() || !creator.trim()) {
+    if (!selectedDate || !title.trim() || !creator.trim() || releaseYearError) {
       return;
     }
 
@@ -59,6 +82,7 @@ export const EditMediaDialog = (props) => {
       dateConsumed: new Date(selectedDate).toISOString(),
       title: title.trim(),
       creator: creator.trim(),
+      releaseDate: releaseYear,
     });
   };
 
@@ -92,6 +116,16 @@ export const EditMediaDialog = (props) => {
             value={creator}
             onChange={(event) => setCreator(event.target.value)}
           />
+          <TextField
+            label="Release year"
+            value={releaseYear}
+            onChange={(event) =>
+              setReleaseYear(event.target.value.replace(/\D/g, '').slice(0, 4))
+            }
+            error={Boolean(releaseYearError)}
+            helperText={releaseYearError || 'Optional'}
+            slotProps={{ htmlInput: { inputMode: 'numeric' } }}
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -102,7 +136,11 @@ export const EditMediaDialog = (props) => {
           variant="contained"
           onClick={handleSave}
           disabled={
-            !selectedDate || !title.trim() || !creator.trim() || isSaving
+            !selectedDate ||
+            !title.trim() ||
+            !creator.trim() ||
+            Boolean(releaseYearError) ||
+            isSaving
           }
           startIcon={
             isSaving ? <CircularProgress size={16} color="inherit" /> : null

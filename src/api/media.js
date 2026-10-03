@@ -8,8 +8,22 @@ import {
   updateUserBook,
   updateUserMovie,
 } from './firebase';
+import { getReleaseYear } from '../utils/release-year';
 
 export const mediaEntriesQueryKey = ['mediaEntries'];
+
+// Only the release year is stored, e.g. "2005", whatever format the source
+// (TMDB, Google Books, user input) provides.
+const withReleaseYearOnly = (data) => {
+  if (!data || !('releaseDate' in data)) {
+    return data;
+  }
+
+  return {
+    ...data,
+    releaseDate: getReleaseYear(data.releaseDate)?.toString() ?? '',
+  };
+};
 
 export const getMediaEntries = async () => {
   const [books, movies] = await Promise.all([getUserBooks(), getUserMovies()]);
@@ -41,24 +55,26 @@ export const deleteMediaEntry = async ({ id, mediaType }) => {
 };
 
 export const addBookEntry = async (bookData) => {
-  await addBookToUser(bookData);
+  await addBookToUser(withReleaseYearOnly(bookData));
 };
 
 export const addMovieEntry = async (movieData) => {
-  await addMovieToUser(movieData);
+  await addMovieToUser(withReleaseYearOnly(movieData));
 };
 
 export const updateMediaEntry = async ({ id, mediaType, data }) => {
+  const normalizedData = withReleaseYearOnly(data);
+
   if (mediaType === 'movie') {
-    await updateUserMovie(id, data);
+    await updateUserMovie(id, normalizedData);
     return;
   }
 
-  await updateUserBook(id, data);
+  await updateUserBook(id, normalizedData);
 };
 
-export const searchBooksByTitle = async (title) => {
-  const query = title?.trim();
+export const searchBooksByTerm = async (term) => {
+  const query = term?.trim();
   if (!query) {
     return [];
   }
@@ -81,6 +97,10 @@ export const searchBooksByTitle = async (title) => {
   const data = await response.json();
   return data.items ?? [];
 };
+
+// w154 is TMDB's smallest poster size that stays sharp on retina screens
+// at the ~60px width used in search results.
+const TMDB_POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w154';
 
 const getTmdbApiKey = () => {
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
@@ -116,7 +136,11 @@ export const searchMoviesByTitle = async (title) => {
   return results.map((movie) => ({
     id: movie.id,
     title: movie.title,
+    overview: movie.overview ?? '',
     releaseDate: movie.release_date ?? '',
+    posterUrl: movie.poster_path
+      ? `${TMDB_POSTER_BASE_URL}${movie.poster_path}`
+      : '',
   }));
 };
 
