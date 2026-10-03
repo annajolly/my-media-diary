@@ -27,7 +27,6 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  useTheme,
   TablePagination,
 } from '@mui/material';
 import { format } from 'date-fns';
@@ -41,7 +40,6 @@ import {
 import { EditMediaDialog } from './EditMediaDialog';
 
 export const MediaTable = () => {
-  const theme = useTheme();
   const [selectedMedia, setSelectedMedia] = React.useState();
   const [selectedEditMedia, setSelectedEditMedia] = React.useState();
   const [mediaFilters, setMediaFilters] = React.useState(['book', 'movie']);
@@ -199,11 +197,12 @@ export const MediaTable = () => {
   if (isLoading) {
     return (
       <Box
-        display="flex"
-        // width="calc(100vw - 64px)"
-        height="calc(100vh - 200px)"
-        justifyContent="center"
-        alignItems="center"
+        sx={{
+          display: 'flex',
+          height: 'calc(100vh - 200px)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
         <CircularProgress />
       </Box>
@@ -350,12 +349,7 @@ export const MediaTable = () => {
                 </TableCell>
                 <TableCell>{formatDateCell(row.dateConsumed)}</TableCell>
                 <TableCell>
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      color: 'text.secondary',
-                    }}
-                  >
+                  <Typography color="textSecondary" sx={{ fontWeight: 600 }}>
                     {row.title}
                   </Typography>
                 </TableCell>
