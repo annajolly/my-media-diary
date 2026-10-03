@@ -17,7 +17,7 @@ import {
 } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: 'my-media-diary-auth.firebaseapp.com',
   projectId: 'my-media-diary-auth',
   storageBucket: 'my-media-diary-auth.firebasestorage.app',
