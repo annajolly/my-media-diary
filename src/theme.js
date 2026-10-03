@@ -3,12 +3,15 @@ import { createTheme } from '@mui/material/styles';
 const commonComponentsTheme = {
   MuiDialogTitle: {
     styleOverrides: {
-      root: {
+      root: ({ theme }) => ({
         fontSize: 20,
         fontWeight: 700,
-        color: '#e2e2e6',
+        color:
+          theme.palette.mode === 'dark'
+            ? '#e2e2e6'
+            : theme.palette.text.tertiary,
         letterSpacing: '-0.01em',
-      },
+      }),
     },
   },
 };
@@ -18,7 +21,7 @@ export const lightTheme = createTheme({
     mode: 'light',
     primary: { main: '#0c1f1a', contrastText: '#ffffff' },
     background: { default: '#f9f9fd', paper: '#ffffff' },
-    text: { primary: '#191c1e', secondary: '#41484d' },
+    text: { primary: '#191c1e', secondary: '#41484d', tertiary: '#334c43' },
     divider: '#d9dade',
   },
   typography: {
@@ -47,7 +50,7 @@ export const darkTheme = createTheme({
     primary: { main: '#b6cbc3', contrastText: '#21342e' },
     secondary: { main: '#04b4a2', light: '#00bcd4', contrastText: '#003731' },
     background: { default: '#101415', paper: '#1d2022' },
-    text: { primary: '#c2c8c4', secondary: '#8e9196' },
+    text: { primary: '#c2c8c4', secondary: '#8e9196', tertiary: '#bacbc4' },
     divider: '#363a3b',
   },
   typography: {

@@ -353,7 +353,7 @@ export const MediaTable = () => {
                 </TableCell>
                 <TableCell>{formatDateCell(row.dateConsumed)}</TableCell>
                 <TableCell>
-                  <Typography color="textSecondary" sx={{ fontWeight: 600 }}>
+                  <Typography sx={{ fontWeight: 600, color: 'text.tertiary' }}>
                     {row.title}
                   </Typography>
                 </TableCell>

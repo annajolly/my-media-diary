@@ -74,7 +74,7 @@ export const EditMediaDialog = (props) => {
     >
       <DialogTitle>Edit media</DialogTitle>
       <DialogContent dividers>
-        <Stack spacing={2} marginTop={1}>
+        <Stack spacing={2} sx={{ marginTop: 1 }}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Date consumed"
