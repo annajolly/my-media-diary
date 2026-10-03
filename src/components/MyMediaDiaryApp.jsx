@@ -25,10 +25,12 @@ export const MyMediaDiaryApp = ({ themeMode, onToggleThemeMode }) => {
       <Header themeMode={themeMode} onToggleThemeMode={onToggleThemeMode} />
       {isLoadingAuth && (
         <Box
-          display="flex"
-          height="100vh"
-          justifyContent="center"
-          alignItems="center"
+          sx={{
+            display: 'flex',
+            height: '100vh',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
           <CircularProgress />
         </Box>

@@ -356,7 +356,10 @@ export const AddMediaDialog = (props) => {
                   );
                 })}
               </RadioGroup>
-              <Stack direction="row" justifyContent="flex-end" marginTop={2}>
+              <Stack
+                direction="row"
+                sx={{ justifyContent: 'flex-end', marginTop: 2 }}
+              >
                 <Button
                   variant="contained"
                   onClick={handleAddBookFromSearch}
@@ -408,7 +411,7 @@ export const AddMediaDialog = (props) => {
                     sx={{ flexGrow: 1 }}
                   />
                 </Stack>
-                <Stack direction="row" justifyContent="flex-end">
+                <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                   <Button
                     variant="contained"
                     type="submit"
@@ -480,7 +483,10 @@ export const AddMediaDialog = (props) => {
                   );
                 })}
               </RadioGroup>
-              <Stack direction="row" justifyContent="flex-end" marginTop={2}>
+              <Stack
+                direction="row"
+                sx={{ justifyContent: 'flex-end', marginTop: 2 }}
+              >
                 <Button
                   variant="contained"
                   onClick={handleAddMovieFromSearch}

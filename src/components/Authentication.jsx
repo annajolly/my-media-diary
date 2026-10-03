@@ -8,13 +8,15 @@ export const Authentication = () => {
 
   return (
     <Box
-      width="100%"
-      mt="20vh"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
+      sx={{
+        width: '100%',
+        mt: '20vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
-      <Box m={2} width="400px" maxWidth="100%">
+      <Box sx={{ m: 2, width: '400px', maxWidth: '100%' }}>
         {loginOrRegister === 'login' ? (
           <Login setLoginOrRegister={setLoginOrRegister} />
         ) : (

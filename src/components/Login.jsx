@@ -55,7 +55,7 @@ export const Login = (props) => {
   };
 
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       Login
       <Stack
         ref={formRef}
@@ -63,7 +63,7 @@ export const Login = (props) => {
         component="form"
         noValidate
         autoComplete="off"
-        gap={2}
+        sx={{ gap: 2 }}
       >
         <TextField
           id="login-form-email"

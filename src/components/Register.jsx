@@ -75,7 +75,7 @@ export const Register = (props) => {
   };
 
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       Register
       <Stack
         ref={formRef}
@@ -83,7 +83,7 @@ export const Register = (props) => {
         component="form"
         noValidate
         autoComplete="off"
-        gap={2}
+        sx={{ gap: 2 }}
       >
         <TextField
           id="register-form-email"

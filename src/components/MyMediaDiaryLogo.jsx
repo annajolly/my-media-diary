@@ -27,7 +27,7 @@ export const MyMediaDiaryLogo = () => {
                     height="220"
                     fill="#000000"
                     stroke="none"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{ fill: 'light-dark(rgb(0, 0, 0), rgb(0, 43, 42))' }}
                   />
                 </g>
@@ -41,7 +41,7 @@ export const MyMediaDiaryLogo = () => {
                     height="220"
                     fill="#000000"
                     stroke="none"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{ fill: 'light-dark(rgb(0, 0, 0), rgb(0, 43, 42))' }}
                   />
                 </g>
@@ -56,7 +56,7 @@ export const MyMediaDiaryLogo = () => {
                     fill="#ffffff"
                     stroke="none"
                     transform="rotate(-45,88.11,102.1)"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{
                       fill: 'light-dark(rgb(255, 255, 255), rgb(0, 43, 42))',
                     }}
@@ -73,7 +73,7 @@ export const MyMediaDiaryLogo = () => {
                     fill="#ffffff"
                     stroke="none"
                     transform="rotate(45,184,102.1)"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{
                       fill: 'light-dark(rgb(255, 255, 255), rgb(0, 43, 42))',
                     }}
@@ -87,7 +87,7 @@ export const MyMediaDiaryLogo = () => {
                     fill="#ffffff"
                     stroke="none"
                     transform="rotate(-100,159.39,60.01)"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{
                       fill: 'light-dark(rgb(255, 255, 255), rgb(0, 43, 42))',
                     }}
@@ -101,7 +101,7 @@ export const MyMediaDiaryLogo = () => {
                     fill="#ffffff"
                     stroke="none"
                     transform="rotate(-85,172.5,69.57)"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{
                       fill: 'light-dark(rgb(255, 255, 255), rgb(0, 43, 42))',
                     }}
@@ -115,7 +115,7 @@ export const MyMediaDiaryLogo = () => {
                     fill="#ffffff"
                     stroke="none"
                     transform="rotate(-115,145.47,54.08)"
-                    pointer-events="all"
+                    pointerEvents="all"
                     style={{
                       fill: 'light-dark(rgb(255, 255, 255), rgb(0, 43, 42))',
                     }}
