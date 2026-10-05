@@ -42,6 +42,7 @@ export const AddMediaDialog = (props) => {
   const [movieSearchResults, setMovieSearchResults] = React.useState([]);
   const [selectedMovieResultId, setSelectedMovieResultId] =
     React.useState(null);
+  const [selectedDate, setSelectedDate] = React.useState(null);
   const [error, setError] = React.useState('');
   const bookSearchFormRef = React.useRef(null);
   const movieSearchFormRef = React.useRef(null);
@@ -53,6 +54,7 @@ export const AddMediaDialog = (props) => {
     }
 
     setSelectedMediaType('book');
+    setSelectedDate(null);
     setBookSearchResults([]);
     setSelectedBookResultId(null);
     setMovieSearchResults([]);
@@ -87,13 +89,11 @@ export const AddMediaDialog = (props) => {
     setError('');
   };
 
-  const handleSelectedResultChange = (e, result) => {
-    console.log(result, e.target.value);
+  const handleSelectedResultChange = (_, result) => {
     setSelectedBookResultId(result);
   };
 
-  const handleSelectedMovieResultChange = (e, result) => {
-    console.log(result, e.target.value);
+  const handleSelectedMovieResultChange = (_, result) => {
     setSelectedMovieResultId(result);
   };
 
@@ -113,8 +113,6 @@ export const AddMediaDialog = (props) => {
     }
 
     setError('');
-
-    console.log(title);
 
     try {
       const books = await searchBooksByTerm(title);
@@ -157,12 +155,10 @@ export const AddMediaDialog = (props) => {
     );
     const formData = new FormData(bookSearchFormRef.current);
 
-    const dateConsumed = formData.get('add-media-date-consumed')?.toString();
-
     const title = selectedBook?.volumeInfo?.title;
     const creator = selectedBook?.volumeInfo?.authors?.join(', ');
 
-    if (!dateConsumed) {
+    if (!selectedDate) {
       setError('No date selected');
       return;
     }
@@ -177,7 +173,7 @@ export const AddMediaDialog = (props) => {
     await addBookMutation.mutateAsync({
       title,
       creator,
-      dateConsumed,
+      dateConsumed: selectedDate.toString(),
     });
   };
 
@@ -185,11 +181,8 @@ export const AddMediaDialog = (props) => {
     const selectedMovie = movieSearchResults.find(
       (result) => String(result.id) === String(selectedMovieResultId),
     );
-    const formData = new FormData(movieSearchFormRef.current);
 
-    const dateConsumed = formData.get('add-media-date-consumed')?.toString();
-
-    if (!dateConsumed) {
+    if (!selectedDate) {
       setError('No date selected');
       return;
     }
@@ -207,7 +200,7 @@ export const AddMediaDialog = (props) => {
       title: details.title || selectedMovie.title,
       creator: details.creator,
       releaseDate: details.releaseDate || selectedMovie.releaseDate || '',
-      dateConsumed,
+      dateConsumed: selectedDate.toString(),
     });
   };
 
@@ -253,6 +246,8 @@ export const AddMediaDialog = (props) => {
             label={`Date ${selectedMediaType === 'book' ? 'read' : 'watched'}`}
             id="add-media-date-consumed"
             name="add-media-date-consumed"
+            value={selectedDate}
+            onChange={setSelectedDate}
             slotProps={{ textField: { size: 'small' } }}
           />
         </LocalizationProvider>
@@ -324,7 +319,7 @@ export const AddMediaDialog = (props) => {
               <Stack
                 direction={{ xs: 'column', md: 'row' }}
                 display="flex"
-                alignItems={{ xs: 'stretch', md: 'center' }}
+                sx={{ alignItems: { xs: 'stretch', md: 'center' } }}
                 spacing={2}
               >
                 <TextField
@@ -395,7 +390,7 @@ export const AddMediaDialog = (props) => {
               <Stack spacing={2}>
                 <Stack
                   direction={{ xs: 'column', md: 'row' }}
-                  alignItems={{ xs: 'stretch', md: 'center' }}
+                  sx={{ alignItems: { xs: 'stretch', md: 'center' } }}
                   spacing={2}
                 >
                   <TextField
@@ -450,7 +445,7 @@ export const AddMediaDialog = (props) => {
               <Stack
                 direction={{ xs: 'column', md: 'row' }}
                 display="flex"
-                alignItems={{ xs: 'stretch', md: 'center' }}
+                sx={{ alignItems: { xs: 'stretch', md: 'center' } }}
                 spacing={2}
               >
                 <TextField
