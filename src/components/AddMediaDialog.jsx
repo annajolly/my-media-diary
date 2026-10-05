@@ -244,24 +244,26 @@ export const AddMediaDialog = (props) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Add media</DialogTitle>
       {error && <Alert severity="error">{error}</Alert>}
       <DialogContent dividers>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
-            label="Date consumed"
+            label={`Date ${selectedMediaType === 'book' ? 'read' : 'watched'}`}
             id="add-media-date-consumed"
             name="add-media-date-consumed"
+            slotProps={{ textField: { size: 'small' } }}
           />
         </LocalizationProvider>
-        <FormControl sx={{ width: '100%', marginY: 1, height: '100px' }}>
+        <FormControl sx={{ width: '100%', marginY: 1 }}>
           <RadioGroup
             row
             aria-label="media type"
             name="selected-state"
             value={selectedMediaType}
             onChange={handleChange}
+            sx={{ marginTop: 1 }}
           >
             <Grid
               container
@@ -276,7 +278,7 @@ export const AddMediaDialog = (props) => {
                       direction="row"
                       sx={{ gap: 2, alignItems: 'center' }}
                     >
-                      <BookIcon size={32} weight="fill" />
+                      <BookIcon size={32} />
                       <Typography variant="h6">Book</Typography>
                     </Stack>
                   }
@@ -290,7 +292,7 @@ export const AddMediaDialog = (props) => {
                       direction="row"
                       sx={{ gap: 2, alignItems: 'center' }}
                     >
-                      <FilmReelIcon size={32} weight="fill" />
+                      <FilmReelIcon size={32} />
                       <Typography variant="h6">Movie</Typography>
                     </Stack>
                   }
@@ -330,6 +332,7 @@ export const AddMediaDialog = (props) => {
                   name="add-book-search-title"
                   label="Title"
                   variant="outlined"
+                  size="small"
                   sx={{ flexGrow: 1 }}
                 />
                 <Button variant="contained" type="submit">
@@ -358,10 +361,7 @@ export const AddMediaDialog = (props) => {
                   );
                 })}
               </RadioGroup>
-              <Stack
-                direction="row"
-                sx={{ justifyContent: 'flex-end', marginTop: 2 }}
-              >
+              <Stack direction="row" sx={{ marginTop: 2 }}>
                 <Button
                   variant="contained"
                   onClick={handleAddBookFromSearch}
@@ -403,6 +403,7 @@ export const AddMediaDialog = (props) => {
                     name="add-book-manual-title"
                     label="Title"
                     variant="outlined"
+                    size="small"
                     sx={{ flexGrow: 1 }}
                   />
                   <TextField
@@ -410,10 +411,11 @@ export const AddMediaDialog = (props) => {
                     name="add-book-manual-creator"
                     label="Creator"
                     variant="outlined"
+                    size="small"
                     sx={{ flexGrow: 1 }}
                   />
                 </Stack>
-                <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
+                <Stack direction="row">
                   <Button
                     variant="contained"
                     type="submit"
@@ -456,6 +458,7 @@ export const AddMediaDialog = (props) => {
                   name="add-movie-search-title"
                   label="Movie title"
                   variant="outlined"
+                  size="small"
                   sx={{ flexGrow: 1 }}
                 />
                 <Button variant="contained" type="submit">
@@ -503,10 +506,7 @@ export const AddMediaDialog = (props) => {
                   );
                 })}
               </RadioGroup>
-              <Stack
-                direction="row"
-                sx={{ justifyContent: 'flex-end', marginTop: 2 }}
-              >
+              <Stack direction="row" sx={{ marginTop: 2 }}>
                 <Button
                   variant="contained"
                   onClick={handleAddMovieFromSearch}

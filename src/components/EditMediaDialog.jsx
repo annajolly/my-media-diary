@@ -104,19 +104,23 @@ export const EditMediaDialog = (props) => {
               label="Date consumed"
               value={selectedDate}
               onChange={setSelectedDate}
+              slotProps={{ textField: { size: 'small' } }}
             />
           </LocalizationProvider>
           <TextField
+            size="small"
             label="Title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
           />
           <TextField
+            size="small"
             label="Creator"
             value={creator}
             onChange={(event) => setCreator(event.target.value)}
           />
           <TextField
+            size="small"
             label="Release year"
             value={releaseYear}
             onChange={(event) =>

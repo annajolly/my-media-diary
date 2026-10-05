@@ -430,7 +430,7 @@ export const MediaTable = () => {
                   direction={sortBy === 'creator' ? sortDirection : 'asc'}
                   onClick={handleSort('creator')}
                 >
-                  Creator
+                  Author/ Director
                 </TableSortLabel>
               </TableCell>
               <TableCell
