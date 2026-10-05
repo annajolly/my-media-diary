@@ -17,14 +17,12 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Create .env file
-        run: |
-          echo "VITE_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }}" > .env
-          echo "VITE_GOOGLE_BOOKS_API_KEY=${{ secrets.REACT_APP_GOOGLE_BOOKS_API_KEY }}" >> .env
-          echo "VITE_TMDB_API_KEY=${{ secrets.REACT_APP_TMDB_API_KEY }}" >> .env
-
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_GOOGLE_BOOKS_API_KEY: ${{ secrets.VITE_GOOGLE_BOOKS_API_KEY }}
+          VITE_TMDB_API_KEY: ${{ secrets.VITE_TMDB_API_KEY }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
