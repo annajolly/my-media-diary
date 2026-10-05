@@ -53,7 +53,7 @@ export const Header = ({ themeMode = 'light', onToggleThemeMode }) => {
                 fontSize: '1.25rem',
                 color: 'rgb(250, 240, 230)',
                 letterSpacing: '-0.01em',
-                display: 'flex',
+                display: { xs: 'none', sm: 'flex' },
                 alignItems: 'center',
               }}
             >

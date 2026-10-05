@@ -267,10 +267,10 @@ export const AddMediaDialog = (props) => {
           >
             <Grid
               container
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+              spacing={{ xs: 1, sm: 2, md: 3 }}
               sx={{ width: '100%' }}
             >
-              <Grid size={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <CustomRadio
                   value="book"
                   label={
@@ -284,7 +284,7 @@ export const AddMediaDialog = (props) => {
                   }
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <CustomRadio
                   value="movie"
                   label={

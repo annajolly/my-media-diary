@@ -284,12 +284,12 @@ export const MediaTable = () => {
     <>
       <Card sx={{ mb: 2 }}>
         <Stack
-          direction="row"
+          direction={{ xs: 'column', sm: 'row' }}
           sx={{
             justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 2,
-            p: 2,
+            alignItems: { sm: 'center' },
+            gap: { xs: 1, sm: 2 },
+            p: { xs: 1, sm: 2 },
           }}
         >
           <ToggleButtonGroup
@@ -326,7 +326,7 @@ export const MediaTable = () => {
           <Stack
             direction="row"
             sx={{
-              justifyContent: 'flex-end',
+              justifyContent: { sm: 'flex-end' },
               alignItems: 'center',
               gap: 2,
             }}
@@ -372,6 +372,7 @@ export const MediaTable = () => {
               startIcon={<MagicWandIcon />}
               onClick={handleAutoFillClicked}
               disabled={entriesMissingMetadata.length === 0}
+              sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}
             >
               Auto-fill metadata
               {entriesMissingMetadata.length > 0 &&
