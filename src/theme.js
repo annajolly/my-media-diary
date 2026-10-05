@@ -135,6 +135,11 @@ export const darkTheme = createTheme({
         },
         input: {
           backgroundColor: 'inherit',
+          '&:-webkit-autofill': {
+            WebkitBoxShadow: '0 0 0 100px rgb(16,20,21) inset',
+            WebkitTextFillColor: '#c2c8c4',
+            caretColor: '#c2c8c4',
+          },
         },
       },
     },
@@ -145,6 +150,11 @@ export const darkTheme = createTheme({
         },
         input: {
           backgroundColor: 'inherit',
+          '&:-webkit-autofill': {
+            WebkitBoxShadow: '0 0 0 100px rgb(16,20,21) inset',
+            WebkitTextFillColor: '#c2c8c4',
+            caretColor: '#c2c8c4',
+          },
         },
       },
     },
