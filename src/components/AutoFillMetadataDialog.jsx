@@ -76,7 +76,6 @@ const searchByMediaType = async (mediaType, title) => {
     mediaType === 'book'
       ? await searchBooksByTerm(title)
       : await searchMoviesByTitle(title);
-  console.log(results);
   return toResultOptions(mediaType, results);
 };
 

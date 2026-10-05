@@ -40,7 +40,6 @@ export const Login = (props) => {
           signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
               var user = userCredential.user;
-              console.log(user);
               setUser(user);
             })
             .catch((error) => {
